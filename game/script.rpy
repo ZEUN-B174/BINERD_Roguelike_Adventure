@@ -46,6 +46,9 @@ init python:
     RedShoes = False # 빨간 구두
     badpocket = False # 구멍난 주머니
 
+    # 기타 코드
+    meru_process = 1 # 메루디스탄 사건 진척도.
+
 init:
     screen stat():
         frame:
@@ -540,6 +543,7 @@ label template_dream:
 # 사건 템플릿
 
 label merudistan:
+    $ meru_process = 2
     scene black with dissolve
     "..."
     na "하필이면 내가 가야 할 길에 사창가가 껴있다니."
@@ -551,7 +555,9 @@ label merudistan:
     show meru confident
     "???" "정말 기묘한 인연이군. 날 만나는 건 하늘의 별 따기일텐데."
     show meru merong
-    m "난 메루야. 다른 세계의 나는 쿠르디스탄의 유명 아이돌이겠지만, 난 그 녀석이 아니야."
+    m "만나서 반가워. 난 메루라고 해."
+    m "흐흥, 멀티버스에 대해서 들어본 적 있니?"
+    m "어떤 사람은 날 쿠르디스탄의 귀여운 아이돌로 알고있겠지만, 난 그녀석과는 달라."
     m "쿠르디스탄의 천재 해커, 화류계의 정상이 바로 나지."
     show meru confident
     m "이렇게 마주친 기념으로 선물을 하나 줄게. 골라봐."
@@ -567,11 +573,41 @@ label merudistan:
     show meru confident
     m "그럼 나중에 인연이 되면 또 보자고."
     show meru normal
-    
     m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}방랑자여, 앞으로 나아가 길을 선택하거라."
 
     jump backto
-# 사건 99: 메루디스탄
+# 사건 99: 메루디스탄 (1)
+
+label merudistan_2:
+    scene black with dissolve
+    "..."
+    na "하필이면 내가 가야 할 길에 사창가가..."
+    na "응? 또야?"
+    scene amste with dissolve
+    "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
+    "길을 걷던 중,무의식적으로 들어간 건물에서 고급진 테이블 앞에 앉아있는 메루와 마주친다."
+    show meru normal with dissolve
+    "???" "...흐응? 또야?"
+    show meru confident
+    "???" "정말 기묘한 인연이군. 날 두 번이나 만나는 건 하늘의 별 따기일텐데."
+    show meru merong
+    m "또 만나서 반가워. 저번에도 말했지만, 난 메루라고 해."
+    m "날 두번이나 만날 정도면 인연을 넘어선 운명 아닐까?"
+    m "자, 이번에도 골라봐."
+    show meru normal
+    menu:
+        "[[꿈결 비단]: 방어력이 100 증가한다.":
+            $ Def += 100
+        "[[금실을 엮는 바늘]: 공격력이 100 증가한다.":
+            $ Atk += 100     
+    
+    show meru confident
+    m "그럼 나중에 또 보자."
+    show meru normal
+    m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}방랑자여, 앞으로 나아가 길을 선택하거라."
+
+    jump backto
+# 사건 99: 메루디스탄 (2)
 
 # 보상 구역 이벤트
 
@@ -612,7 +648,10 @@ label sleep:
     if todream == "이세계 은행":
         jump bank
     elif todream == "메루디스탄":
-        jump merudistan
+        if meru_process == 1:
+            jump merudistan
+        elif meru_process == 2:
+            jump merudistan_2
     elif todream == "룰렛 TV쇼":
         jump roulette
     else:
