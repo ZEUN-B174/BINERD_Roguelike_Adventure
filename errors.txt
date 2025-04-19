@@ -1,0 +1,10 @@
+﻿I'm sorry, but errors were detected in your script. Please correct the
+errors listed below, and try again.
+
+
+File "game/script.rpy", line 540: expected ':' not found.
+    else if todream == "메루디스탄":
+         ^
+
+Ren'Py Version: Ren'Py 8.3.7.25031702
+Tue Apr 15 21:53:22 2025
