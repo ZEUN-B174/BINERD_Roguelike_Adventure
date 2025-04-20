@@ -102,6 +102,7 @@ define a = Character('Mîxayîl', color="#514ed7")
 define na = Character("[name]", color="#565274")
 define m = Character('메루', color="#7c4dff")
 define m3ru = Character(who_bold=True, what_italic=True, what_xalign=0.5, what_textalign=0.5, what_color="#7c4dff")
+define ezdan = Character('야즈단', what_italic=True, color="#7c4dff")
 
 # 여기에서부터 게임이 시작합니다.
 label start:
@@ -211,6 +212,8 @@ label StandBy:
     $ areanum = 0
     $ floor = 1
     $ ether = 200
+    if meru_process == "done":
+        $ meru_process = 1
     scene bg1 with dissolve
     menu:
         "무엇을 하실 건가요?"
@@ -326,9 +329,18 @@ label happening:
         dreamed1 = False
         dreamed2 = False
         dreamed3 = False
+
         dream1 = DreamList[random.randrange(0, len(DreamList))]
+        while (dream1 == "메루디스탄" and meru_process == "done"):
+            dream1 = DreamList[random.randrange(0, len(DreamList))]
+        
         dream2 = DreamList[random.randrange(0, len(DreamList))]
+        while (dream2 == "메루디스탄" and meru_process == "done"):
+            dream2 = DreamList[random.randrange(0, len(DreamList))]
+        
         dream3 = DreamList[random.randrange(0, len(DreamList))]
+        while (dream3 == "메루디스탄" and meru_process == "done"):
+            dream31 = DreamList[random.randrange(0, len(DreamList))]
     
     jump backto
 
@@ -549,13 +561,14 @@ label merudistan:
     na "하필이면 내가 가야 할 길에 사창가가 껴있다니."
     scene amste with dissolve
     "어쩔 수 없이 나는 어느 사창가에 들어서게 되었다."
-    "길을 걷던 중,무의식적으로 들어간 건물에서 고급진 테이블 앞에 앉아있는 한 창녀와 마주친다."
+    "길을 걷던 중, 무의식적으로 들어간 건물에서 고급진 테이블 앞에 앉아있는 한 창녀와 마주친다."
     show meru normal with dissolve
     "???" "...흐응?"
     show meru confident
     "???" "정말 기묘한 인연이군. 날 만나는 건 하늘의 별 따기일텐데."
     show meru merong
     m "만나서 반가워. 난 메루라고 해."
+    show meru normal
     m "흐흥, 멀티버스에 대해서 들어본 적 있니?"
     m "어떤 사람은 날 쿠르디스탄의 귀여운 아이돌로 알고있겠지만, 난 그녀석과는 달라."
     m "쿠르디스탄의 천재 해커, 화류계의 정상이 바로 나지."
@@ -579,20 +592,23 @@ label merudistan:
 # 사건 99: 메루디스탄 (1)
 
 label merudistan_2:
+    $ meru_process = 3
     scene black with dissolve
     "..."
     na "하필이면 내가 가야 할 길에 사창가가..."
     na "응? 또야?"
     scene amste with dissolve
     "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
-    "길을 걷던 중,무의식적으로 들어간 건물에서 고급진 테이블 앞에 앉아있는 메루와 마주친다."
+    "길을 걷던 중, 이전과 같은 건물에 들어가 고급진 테이블 앞에 앉아있는 메루와 마주친다."
     show meru normal with dissolve
-    "???" "...흐응? 또야?"
+    m "...흐응? 또야?"
     show meru confident
-    "???" "정말 기묘한 인연이군. 날 두 번이나 만나는 건 하늘의 별 따기일텐데."
+    m "정말 기묘한 인연이군. 날 두 번이나 만나는 건 하늘의 별 따기일텐데."
     show meru merong
     m "또 만나서 반가워. 저번에도 말했지만, 난 메루라고 해."
+    show meru normal
     m "날 두번이나 만날 정도면 인연을 넘어선 운명 아닐까?"
+    show meru confident
     m "자, 이번에도 골라봐."
     show meru normal
     menu:
@@ -608,6 +624,63 @@ label merudistan_2:
 
     jump backto
 # 사건 99: 메루디스탄 (2)
+
+label merudistan_3:
+    $ meru_process = "done"
+    scene black with dissolve
+    "..."
+    na "하필이면 내가 가야 할 길에"
+    extend "..."
+    na "\"사창가가 있다니\"... 또야?"
+    scene amste with dissolve
+    "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
+    "길을 걷던 중, 전에는 알아차리지 못했던 신비한 분위기를 풍기는 그 건물에 들어가 날 지그시 바라보는 메루와 마주친다."
+    show meru confident with dissolve
+    m "흐흥~ 정말 끈질긴 인연이라니까~"
+    show meru normal
+    m "날 세 번 연속으로 만날 확률은 극히 적은데 말이지,"
+    show meru merong
+    m "뭐, 수없이 계속하다 보면 언젠가는 그럴 날이 오긴 하겠지만."
+    show meru normal
+    m "저기, 내가 재밌는 걸 하나 알려줄까?"
+    m "넌 내가 진짜 메루라고 생각해? 아니면 아니라고 생각해?"
+    na "그게 무슨..."
+    menu:
+        m "대답해 볼래?"
+        "맞다":
+            menu:
+                m "진짜?"
+                "맞다":
+                    menu:
+                        m3ru "정말?"
+                        "아니다":
+                            m "..."
+                        "아니다":
+                            m "..."
+                "아니다":
+                    m "..."
+        "아니다":
+            m "..."
+    show meru confident
+    m "맞아, 난 사실..."
+    show meru normal
+    ezdan "전지전능한 야지디족의 신, 야즈단이지."
+    show meru merong
+    ezdan "미안, 메루의 몸을 빌린 건 그 녀석이 가장 먼저 만들어진 스프라이트라서 그랬어."
+    show meru confident
+    ezdan "우리 귀여운 야지디족 프로그래머가 대단한 일을 벌이고 있는데, 이걸 그냥 보고만 있기에는 엄청 아까운 것 같아서 여기에 한번 와 본거야."
+    show meru injang
+    ezdan "이 모습을 그 애가 아닌 네가 보고 있다는 게 좀 웃기긴 하지만..."
+    show meru normal
+    ezdan "나중에 걔한테도 이 일을 말해주면 좋을 것 같아."
+    ezdan "페르윈, 그녀석이 가장 바라고 있는 일이 날 직접 보는거니까."
+    show meru confident
+    ezdan "그럼 나중에 또 보자."
+    show meru normal
+    ezdan "{i}Gerok, pêşde herin û riya xwe hilbijêrin.{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}"
+
+    jump backto
+# 사건 99: 메루디스탄 (3)
 
 # 보상 구역 이벤트
 
@@ -652,6 +725,8 @@ label sleep:
             jump merudistan
         elif meru_process == 2:
             jump merudistan_2
+        elif meru_process == 3:
+            jump merudistan_3
     elif todream == "룰렛 TV쇼":
         jump roulette
     else:
