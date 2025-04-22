@@ -192,6 +192,7 @@ label Tutorial:
     a "박사님이 마저 하지 못한 설명은 제가 해드릴테니 걱정하지 마세요."
     show screen stat
     a "이건 게임에 들어가면 보이는 당신의 능력치를 나타낸 상태창이랍니다."
+    a "상단에는 체력과 공격력, 방어력, 에테르가 보이고, 하단에는 현재 층과 구역이 보입니다."
     hide screen stat
     a "이건 이쯤에서 넘어가고, 다음으로 박사님이 제대로 말하지 않은 구역에 대해서 설명해드릴게요."
     a "상점 구역: 에테르를 소비해 원하는 기물이나 버프를 구매할 수 있습니다."
@@ -261,10 +262,10 @@ label special:
 label select2:
     scene bg3 with dissolve
     python:
-        area1 = AreaList[random.randint(0, 4)]
-        area2 = AreaList[random.randint(0, 4)]
+        area1 = random.choice(AreaList)
+        area2 = random.choice(AreaList)
         while (area1 == area2):
-            area2 = AreaList[random.randint(0, 4)]
+            area2 = random.choice(AreaList)
     menu:
         "진입할 구역을 정해주세요."
         "[area1]":
@@ -278,13 +279,13 @@ label select2:
 label select3:
     scene bg3 with dissolve
     python:
-        area1 = AreaList[random.randint(0, 4)]
-        area2 = AreaList[random.randint(0, 4)]
+        area1 = random.choice(AreaList)
+        area2 = random.choice(AreaList)
         while (area1 == area2):
-            area2 = AreaList[random.randint(0, 4)]
-        area3 = AreaList[random.randint(0, 4)]
+            area2 = random.choice(AreaList)
+        area3 = random.choice(AreaList)
         while (area1 == area3 or area2 == area3):
-            area3 = AreaList[random.randint(0, 4)]
+            area3 = random.choice(AreaList)
     menu:
         "진입할 구역을 정해주세요."
         "[area1]":
@@ -330,17 +331,17 @@ label happening:
         dreamed2 = False
         dreamed3 = False
 
-        dream1 = DreamList[random.randrange(0, len(DreamList))]
+        dream1 = random.choice(DreamList)
         while (dream1 == "메루디스탄" and meru_process == "done"):
-            dream1 = DreamList[random.randrange(0, len(DreamList))]
+            dream1 = random.choice(DreamList)
         
-        dream2 = DreamList[random.randrange(0, len(DreamList))]
+        dream2 = random.choice(DreamList)
         while (dream2 == "메루디스탄" and meru_process == "done"):
-            dream2 = DreamList[random.randrange(0, len(DreamList))]
+            dream2 = random.choice(DreamList)
         
-        dream3 = DreamList[random.randrange(0, len(DreamList))]
+        dream3 = random.choice(DreamList)
         while (dream3 == "메루디스탄" and meru_process == "done"):
-            dream31 = DreamList[random.randrange(0, len(DreamList))]
+            dream3 = random.choice(DreamList)
     
     jump backto
 
@@ -675,7 +676,7 @@ label merudistan_3:
     ezdan "나중에 걔한테도 이 일을 말해주면 좋을 것 같아."
     ezdan "페르윈, 그녀석이 가장 바라고 있는 일이 날 직접 보는거니까."
     show meru confident
-    ezdan "그럼 나중에 또 보자."
+    ezdan "그럼 나중에 또 보자, [Name]"
     show meru normal
     ezdan "{i}Gerok, pêşde herin û riya xwe hilbijêrin.{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}"
 
@@ -720,7 +721,7 @@ label backto:
 label sleep:
     if todream == "이세계 은행":
         jump bank
-    elif todream == "메루디스탄":
+    elif todream == "메루디스탄": # 연계 이벤트 1
         if meru_process == 1:
             jump merudistan
         elif meru_process == 2:
