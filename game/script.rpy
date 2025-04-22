@@ -34,10 +34,10 @@ init python:
     mode = "none" # 게임모드
 
     # 기물
-    itemlist = ["사탕곰", "드림캐쳐", "미분음 오르골", "체력 증진기 #22", "지갑전사", "꿈바다 샘플 #009", "빨간 구두", "구멍난 주머니"]
+    itemlist = ["곰사탕", "드림캐쳐", "미분음 오르골", "체력 증진기 #22", "지갑전사", "꿈바다 샘플 #009", "빨간 구두", "구멍난 주머니"]
     itemexp = ["곰인형 모양의 사탕. 전투에서 사용하면 체력을 20 회복한다.", "신비로운 문양의 드림캐쳐. 사건에서 로스트 되는 것을 3번 막아준다.", "12음계에서 벗어난 신비한 음을 연주하는 오르골. 꿈 계열 기물의 효과가 2배가 된다.", "다스니 연구소의 체력계 기물. 전투 진입 시, 체력이 2배가 된다.", "다스니 연구소의 현실적인 기물. 에테르에 비례해서 공격력이 증가한다.", "연구소에서 체취한 꿈의 일부. 마시면 기이한 꿈을 꿀 수 있다.", "전투 시 첫 3턴은 무조건 공격만 할 수 있다.", "구역에 입장할 때마다 에테르가 10씩 줄어든다."]
     
-    candybear = False # 사탕곰
+    candybear = False # 곰사탕
     dreamcatcher = False # 드림캐쳐
     musicbox = False # 미분음 오르골
     hpEnhancer = False # 체력 증진기 #22
@@ -48,6 +48,34 @@ init python:
 
     # 기타 코드
     meru_process = 1 # 메루디스탄 사건 진척도.
+
+    # 함수
+    def get_random_item():
+        global dice, itemlist, candybear, dreamcatcher, musicbox, hpEnhancer, WalletWarrior, sample009, RedShoes, badpocket
+        dice = random.randrange(len(itemlist))
+        if itemlist[dice] == "곰사탕":
+            candybear = True
+
+        elif itemlist[dice] == "드림캐쳐":
+            dreamcatcher = True
+
+        elif itemlist[dice] == "미분음 오르골":
+            musicbox = True
+
+        elif itemlist[dice] == "체력 증진기 #22":
+            hpEnhancer = True
+
+        elif itemlist[dice] == "지갑전사":
+            WalletWarrior = True
+
+        elif itemlist[dice] == "꿈바다 샘플 #009":
+            sample009 = True
+
+        elif itemlist[dice] == "빨간 구두":
+            RedShoes = True
+
+        elif itemlist[dice] == "구멍난 주머니":
+            badpocket = True
 
 init:
     screen stat():
@@ -525,11 +553,13 @@ label roulette:
         "어떻게 하지?"
         "그래도 돌린다!":
             "사회자" "결과는...!"
-            $ dice = random.randrange(0, len(itemlist))
+            $ get_random_item()
             "사회자" "축하합니다! {color=#7c4dff}[itemlist[dice]]{/color}(을)를 얻으셨군요!"
             "[itemlist[dice]]: [itemexp[dice]]"
+            na "흠, 이거 좋은거 맞나?"
             scene black
-            "그리고 갑자기 꿈에서 쫒겨났다."
+            "그 순간, 갑자기 바닥이 꺼지고 어두운 바닥으로 떨어지면서..."
+            "...그대로 꿈에서 벗어난다."
         "돌리지 않는다":
             scene black
             "그 순간, 꿈이 일그러지며 뒤틀리고, 꿈에서 쫓겨나게 된다."
