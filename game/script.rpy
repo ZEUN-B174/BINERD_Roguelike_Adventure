@@ -1,6 +1,7 @@
 ﻿# 이 파일에 게임 스크립트를 입력합니다.
 init python:
     import random
+    from dataclasses import dataclass
 
     # 스테이터스
     MaxHP = 100 # 최대체력
@@ -33,7 +34,20 @@ init python:
     HowManyWay = 0 # 꿈 선택지 숫자 정하기용
     mode = "none" # 게임모드
 
+    # 버프
+    @dataclass
+    class Buff:
+        name: str
+        description: str
+        effect: str
+    
     # 기물
+    @dataclass
+    class Item:
+        name: str
+        description: str
+        effect: str
+
     itemlist = ["곰사탕", "드림캐쳐", "미분음 오르골", "체력 증진기 #22", "지갑전사", "꿈바다 샘플 #009", "빨간 구두", "구멍난 주머니"]
     itemexp = ["곰인형 모양의 사탕. 전투에서 사용하면 체력을 20 회복한다.", "신비로운 문양의 드림캐쳐. 사건에서 로스트 되는 것을 3번 막아준다.", "12음계에서 벗어난 신비한 음을 연주하는 오르골. 꿈 계열 기물의 효과가 2배가 된다.", "다스니 연구소의 체력계 기물. 전투 진입 시, 체력이 2배가 된다.", "다스니 연구소의 현실적인 기물. 에테르에 비례해서 공격력이 증가한다.", "연구소에서 체취한 꿈의 일부. 마시면 기이한 꿈을 꿀 수 있다.", "전투 시 첫 3턴은 무조건 공격만 할 수 있다.", "구역에 입장할 때마다 에테르가 10씩 줄어든다."]
     
