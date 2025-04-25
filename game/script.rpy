@@ -3,13 +3,32 @@ init python:
     import random
     from dataclasses import dataclass
 
-    # 스테이터스
+    # 플레이어 스테이터스
     MaxHP = 100 # 최대체력
     Hp = 100 # 현재체력
     Atk = 20 # 공격력
     Def = 10 # 방어력
     Qui = 10 # 민첩도
     ether = 200 # 에테르
+
+    # 적 스테이터스
+    enemyMaxHP = 100 # 적 최대체력
+    enemyHp = 100 # 적 현재체력
+    enemyAtk = 20 # 적 공격력
+    enemyDef = 10 # 적 방어력
+    enemyQui = 10 # 적 민첩도
+    enemyEliment = "" #  적 속성
+    
+    # 적 데이터클래스
+    @dataclass
+    class Enemy:
+        name: str # 이름
+        ele: str # 속성
+        max_hp: int = 100 # 최대체력
+        hp: int = 100 # 현재체력
+        attack: int = 20 # 공격력
+        defence: int = 10 # 방어력
+        qui: int = 10 # 민첩도
 
     #시스템
     area1 = "1" # 구역 1 목적지
@@ -23,6 +42,9 @@ init python:
     dream3 = "c" # 사건 3 목적지
     DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼"]
     todream = "none" # 사건 선택지 저장 변수
+
+    damage = "" # 대미지 표시를 깔끔하게 하기 위한 변수
+
     #선택지 중복 방지용
     dreamed1 = False
     dreamed2 = False
@@ -38,58 +60,80 @@ init python:
     @dataclass
     class Buff:
         name: str
-        description: str
+        script: str
         effect: str
     
     # 기물
     @dataclass
     class Item:
-        name: str
-        description: str
-        effect: str
+        name: str #  기물 이름
+        script: str # 기물 설명
+        effect: str # 기물 효과
+        type_i: str # 기물 종류
+        own: bool = False # 기물을 소유하고 있는지 판단
 
-    itemlist = ["곰사탕", "드림캐쳐", "미분음 오르골", "체력 증진기 #22", "지갑전사", "꿈바다 샘플 #009", "빨간 구두", "구멍난 주머니"]
-    itemexp = ["곰인형 모양의 사탕. 전투에서 사용하면 체력을 20 회복한다.", "신비로운 문양의 드림캐쳐. 사건에서 로스트 되는 것을 3번 막아준다.", "12음계에서 벗어난 신비한 음을 연주하는 오르골. 꿈 계열 기물의 효과가 2배가 된다.", "다스니 연구소의 체력계 기물. 전투 진입 시, 체력이 2배가 된다.", "다스니 연구소의 현실적인 기물. 에테르에 비례해서 공격력이 증가한다.", "연구소에서 체취한 꿈의 일부. 마시면 기이한 꿈을 꿀 수 있다.", "전투 시 첫 3턴은 무조건 공격만 할 수 있다.", "구역에 입장할 때마다 에테르가 10씩 줄어든다."]
-    
-    candybear = False # 곰사탕
-    dreamcatcher = False # 드림캐쳐
-    musicbox = False # 미분음 오르골
-    hpEnhancer = False # 체력 증진기 #22
-    WalletWarrior = False # 지갑전사
-    sample009 = False # 꿈바다 샘플 #009
-    RedShoes = False # 빨간 구두
-    badpocket = False # 구멍난 주머니
+    # 기물 정의
+    dreamcatcher = Item(
+        name = "드림캐쳐",
+        script = "신비로운 문양의 드림캐쳐. 악몽 속성 적에게 가하는 피해가 20% 증가한다.",
+        type_i = "일반",
+        effect = "버프"
+    )
+
+    musicbox = Item(
+        name = "미분음 오르골",
+        script = "12음계에서 벗어난 신비한 음을 연주하는 오르골. 꿈 계열 기물의 효과가 2배가 된다.",
+        type_i = "일반",
+        effect = "버프"
+    )
+
+    hpEnhancer = Item(
+        name = "체력 증진기 #22",
+        script = "다스니 연구소의 체력계 기물. 전투 진입 시, 체력이 2배가 된다.",
+        type_i = "일반",
+        effect = "버프"
+    )
+
+    WalletWarrior = Item(
+        name = "지갑전사",
+        script = "다스니 연구소의 현실적인 기물. 에테르에 비례해서 공격력이 증가한다.",
+        type_i = "일반",
+        effect = "버프"
+    )
+
+    sample009 = Item(
+        name = "꿈바다 샘플 #009",
+        script = "연구소에서 체취한 꿈의 일부. 전투 시 일정 확률로 파괴되며, 파괴될 시 기이한 꿈을 꿀 수 있다.",
+        type_i = "파괴 가능 기물",
+        effect = "미묘한 기물"
+    )
+
+    itemlist = [dreamcatcher, musicbox, hpEnhancer, WalletWarrior, sample009]
 
     # 기타 코드
     meru_process = 1 # 메루디스탄 사건 진척도.
 
     # 함수
-    def get_random_item():
-        global dice, itemlist, candybear, dreamcatcher, musicbox, hpEnhancer, WalletWarrior, sample009, RedShoes, badpocket
-        dice = random.randrange(len(itemlist))
-        if itemlist[dice] == "곰사탕":
-            candybear = True
 
-        elif itemlist[dice] == "드림캐쳐":
-            dreamcatcher = True
+    # 랜덤 아이템 뽑기(디버프 기물 포함)
+    def real_randomitem():
+        item = random.choice(itemlist)
+        while item.own == True:
+            item = random.choice(itemlist)
+        item.own = True
+        return item
 
-        elif itemlist[dice] == "미분음 오르골":
-            musicbox = True
-
-        elif itemlist[dice] == "체력 증진기 #22":
-            hpEnhancer = True
-
-        elif itemlist[dice] == "지갑전사":
-            WalletWarrior = True
-
-        elif itemlist[dice] == "꿈바다 샘플 #009":
-            sample009 = True
-
-        elif itemlist[dice] == "빨간 구두":
-            RedShoes = True
-
-        elif itemlist[dice] == "구멍난 주머니":
-            badpocket = True
+    # 아군 대미지 계산식(나에게 가해지는 대미지)
+    def myDamage():
+        global damage
+        # 공격 회피
+        chance = Qui - enemyQui
+        dice = random.randint(1, 100)
+        if dice <= chance:
+            damage = "회피"
+        else:
+            # 대미지 계산
+            damage = enemyAtk(1/(1 + Def))
 
 init:
     screen stat():
@@ -567,9 +611,9 @@ label roulette:
         "어떻게 하지?"
         "그래도 돌린다!":
             "사회자" "결과는...!"
-            $ get_random_item()
-            "사회자" "축하합니다! {color=#7c4dff}[itemlist[dice]]{/color}(을)를 얻으셨군요!"
-            "[itemlist[dice]]: [itemexp[dice]]"
+            $ dice = real_randomitem()
+            "사회자" "축하합니다! {color=#7c4dff}[dice.name]{/color}(을)를 얻으셨군요!"
+            "[dice.name]: [dice.script]"
             na "흠, 이거 좋은거 맞나?"
             scene black
             "그 순간, 갑자기 바닥이 꺼지고 어두운 바닥으로 떨어지면서..."
@@ -720,7 +764,7 @@ label merudistan_3:
     ezdan "나중에 걔한테도 이 일을 말해주면 좋을 것 같아."
     ezdan "페르윈, 그녀석이 가장 바라고 있는 일이 날 직접 보는거니까."
     show meru confident
-    ezdan "그럼 나중에 또 보자, [Name]"
+    ezdan "그럼 나중에 또 보자, [name]."
     show meru normal
     ezdan "{i}Gerok, pêşde herin û riya xwe hilbijêrin.{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}"
 

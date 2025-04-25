@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 540: expected ':' not found.
-    else if todream == "메루디스탄":
-         ^
+File "game/script.rpy", line 78: invalid syntax
+            script = "신비로운 문양의 드림캐쳐. 악몽 속성 적에게 가하는 피해가 20% 증가한다."
+             ^
 
 Ren'Py Version: Ren'Py 8.3.7.25031702
-Tue Apr 15 21:53:22 2025
+Fri Apr 25 16:22:59 2025
