@@ -51,7 +51,7 @@ init python:
     dream1 = "a" # 사건 1 목적지
     dream2 = "b" # 사건 2 목적지
     dream3 = "c" # 사건 3 목적지
-    DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼"]
+    DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "박사님 무슨 문제라도?"]
     todream = "none" # 사건 선택지 저장 변수
 
     damage = "" # 대미지 표시를 깔끔하게 하기 위한 변수
@@ -164,21 +164,13 @@ init:
             xpadding 50
             ypadding 50
             align (0.075, 0.1)
-            grid 2 5:
+            grid 1 6:
                 text '체력'
-                text "| [Hp]/[MaxHP]"
-
-                text '공격력'
-                text "| [Atk]"
-
-                text '방어력'
-                text "| [Def]"
-
-                text '에테르'
-                text "| [ether]"
-                
-                text "[floor]층"
-                text "| [areanum]구역"
+                bar value StaticValue(Hp, MaxHP) xalign 0.5 xsize 600
+                text '공격력: [Atk]'
+                text '방어력: [Def]'
+                text '에테르: [ether]'
+                text "[floor]차원 [areanum]구역"
 
 # image 문을 사용해 이미지를 정의합니다.
 
@@ -214,8 +206,8 @@ image meru merong = "Meru_merong.png"
 define p = Character('페르윈 다스니', color="#fcb714")
 define a = Character('Mîxayîl', color="#514ed7")
 define na = Character("[name]", color="#565274")
-define m = Character('메루', color="#7c4dff")
-define m3ru = Character(who_bold=True, what_italic=True, what_xalign=0.5, what_textalign=0.5, what_color="#7c4dff")
+define m = Character('「메루」', color="#7c4dff")
+define m3ru = Character(who_bold=True, what_italic=True, what_xalign=0.5, what_textalign=0.5, what_color="#7c4dff", what_font="Caveat-VariableFont_wght.ttf", what_size=100)
 define ezdan = Character('야즈단', what_italic=True, color="#7c4dff")
 
 # 여기에서부터 게임이 시작합니다.
@@ -251,7 +243,7 @@ label start:
         "못 들어봤어요.":
             show tester injang
             p "아, 설명하기 귀찮은데."
-            p "그래도 말 안해주면 엄청 헷갈린 테니까 잘 들어."
+            p "그래도 말 안해주면 엄청 헷갈릴릴 테니까 잘 들어."
             p "로그라이크는 간단히 말해서, 던전 탐험을 하면서 아이템을 얻고, 적과 싸우고, 보스를 처치하는 게임이야."
             p "대부분의 로그라이크는 던전이 랜덤으로 생성되고, 적도 랜덤으로 나오고, 아이템도 랜덤으로 나와."
             p "이런 요소가 로그라이크의 매력이기도 하지."
@@ -638,7 +630,7 @@ label roulette:
     "사회자" "오늘의 우승자, [name]님은 어떤 상품을 가져가게 될까요?"
     "사회자" "[name]님, 앞의 룰렛을 돌려주세요!"
 
-    "근데 아무리 생각해도 이 룰룰렛 좀 위험해 보이는데..."
+    "근데 아무리 생각해도 이 룰렛 좀 위험해 보이는데..."
     menu:
         "어떻게 하지?"
         "그래도 돌린다!":
@@ -662,6 +654,44 @@ label roulette:
 
     jump backto
 # 사건 2: 룰렛
+
+label perwin:
+    scene black with dissolve
+    "..."
+    na "에? 박사님 무슨 일 생겼어요??"
+    scene bg1 with dissolve
+    show perwin at left
+    show tester nonex at right with easeinright
+    p "..."
+    na "..."
+    p "어, 그게..."
+    show tester injang
+    extend "버그가 발생해서 잠깐 온 거야."
+    p "미안!! 얼른 고칠게!!"
+    "..."
+    "......"
+    show tester normal
+    p "자! 다 됐다! 점검 보상으로 셋 중에 하나 골라!"
+
+    menu:
+        "정기점검":
+            "짝수 턴마다 공격력 + 20"
+        "임시점검":
+            "사용 시, 공격력 + 30, 3번 사용 가능하며, 2턴동안 지속된된다."
+        "연장점검":
+            "20턴이 넘어갈 시, 공격력 + 40"
+        "긴급점검":
+            "사용 시, 공격력 + 200, 단 1턴동안 지속된다."
+    p "그럼 이제 가볼게!!"
+    hide perwin with easeoutleft
+    show tester at center with ease
+    na "박사님, 기물 이름이 왜..."
+    na "..."
+    show tester wut
+    extend "이런 미친"
+    hide tester with dissolve
+    jump backto
+# 사건 3: 템플릿
 
 label template_dream:
     scene black with dissolve
@@ -687,19 +717,21 @@ label merudistan:
     na "하필이면 내가 가야 할 길에 사창가가 껴있다니."
     scene amste with dissolve
     "어쩔 수 없이 나는 어느 사창가에 들어서게 되었다."
-    "길을 걷던 중, 무의식적으로 들어간 건물에서 고급진 테이블 앞에 앉아있는 한 창녀와 마주친다."
+    "길을 걷던 중, 무의식적으로 들어간 건물에서 고급진 테이블 앞에 앉아 타로 카드로 점을 보고 있는 한 여자와 마주친다."
     show meru normal with dissolve
     "???" "...흐응?"
+    "그녀는 손에 있던 카드를 내려놓으며 이렇게 말했다."
     show meru confident
     "???" "정말 기묘한 인연이군. 날 만나는 건 하늘의 별 따기일텐데."
     show meru merong
     m "만나서 반가워. 난 메루라고 해."
+    "메루? 페르윈의 친구인 그 매춘부 아닌가?"
     show meru normal
     m "흐흥, 멀티버스에 대해서 들어본 적 있니?"
-    m "어떤 사람은 날 쿠르디스탄의 귀여운 아이돌로 알고있겠지만, 난 그녀석과는 달라."
-    m "쿠르디스탄의 천재 해커, 화류계의 정상이 바로 나지."
+    m "어떤 사람은 날 쿠르디스탄의 귀여운 아이돌이나 창녀 쯤으으로 알고있겠지만, 난 그녀석과는 본질부터 달라."
+    m "운명의 선지자, 위대한 하늘의 대리자. 사람들은 날 이렇게 부르지."
     show meru confident
-    m "이렇게 마주친 기념으로 선물을 하나 줄게. 골라봐."
+    m "뭐, 그래도 이렇게 마주친 기념으로 선물을 하나 줄게. 골라봐."
     show meru normal
     menu gift:
         "[[황금빛 바클라바]: 모든 축복을 획득한다.":
@@ -710,9 +742,9 @@ label merudistan:
             $ ether += 2000
     
     show meru confident
-    m "그럼 나중에 인연이 되면 또 보자고."
+    m "그럼 나중에 인연이 되면 또 보자."
     show meru normal
-    m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}방랑자여, 앞으로 나아가 길을 선택하거라."
+    m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}{font=DungGeunMo.ttf}{size=60}방랑자여, 앞으로 나아가 길을 선택하거라.{/size}{/font}"
 
     jump backto
 # 사건 99: 메루디스탄 (1)
@@ -725,13 +757,13 @@ label merudistan_2:
     na "응? 또야?"
     scene amste with dissolve
     "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
-    "길을 걷던 중, 이전과 같은 건물에 들어가 고급진 테이블 앞에 앉아있는 메루와 마주친다."
+    "길을 걷던 중, 신비로운 분위기를 풍기던 그 건물에 들어가 지루하다는 듯이 타로카드를 보던 「메루」와 마주친다."
     show meru normal with dissolve
     m "...흐응? 또야?"
     show meru confident
     m "정말 기묘한 인연이군. 날 두 번이나 만나는 건 하늘의 별 따기일텐데."
     show meru merong
-    m "또 만나서 반가워. 저번에도 말했지만, 난 메루라고 해."
+    m "또 만나서 반가워. 저번에도 말했지만, 난 「메루」라고 해."
     show meru normal
     m "날 두번이나 만날 정도면 인연을 넘어선 운명 아닐까?"
     show meru confident
@@ -746,7 +778,7 @@ label merudistan_2:
     show meru confident
     m "그럼 나중에 또 보자."
     show meru normal
-    m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}방랑자여, 앞으로 나아가 길을 선택하거라."
+    m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}{font=DungGeunMo.ttf}{size=60}방랑자여, 앞으로 나아가 길을 선택하거라.{/size}{/font}"
 
     jump backto
 # 사건 99: 메루디스탄 (2)
@@ -760,13 +792,15 @@ label merudistan_3:
     na "\"사창가가 있다니\"... 또야?"
     scene amste with dissolve
     "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
-    "길을 걷던 중, 전에는 알아차리지 못했던 신비한 분위기를 풍기는 그 건물에 들어가 날 지그시 바라보는 메루와 마주친다."
+    "길을 걷던 중, 이전과를 다르게 무척이나나 신비한 분위기를 풍기는 그 건물에 들어가 날 지그시 바라보는 메루와 마주친다."
     show meru confident with dissolve
-    m "흐흥~ 정말 끈질긴 인연이라니까~"
+    m "흐흥~ 또보네? 정말 끈질긴 인연이라니까~"
     show meru normal
-    m "날 세 번 연속으로 만날 확률은 극히 적은데 말이지,"
+    m "날 세 번 연속으로 만날 확률은 극히 적은데, 정말 놀랍지 않니?"
     show meru merong
-    m "뭐, 수없이 계속하다 보면 언젠가는 그럴 날이 오긴 하겠지만."
+    m "뭐, 수없이 이 시뮬레이션을 리트라이 하다 보면 언젠가는 그럴 날이 오긴 하겠지만."
+    show meru confident
+    m "아무리 그렇다고 해도 이럴 확률이 적긴 하니까~"
     show meru normal
     m "저기, 내가 재밌는 걸 하나 알려줄까?"
     m "넌 내가 진짜 메루라고 생각해? 아니면 아니라고 생각해?"
@@ -778,7 +812,7 @@ label merudistan_3:
                 m "진짜?"
                 "맞다":
                     menu:
-                        m3ru "정말?"
+                        m3ru "{font=DungGeunMo.ttf}{size=60}정말?{/size}{/font}"
                         "아니다":
                             m "..."
                         "아니다":
@@ -792,9 +826,11 @@ label merudistan_3:
     show meru normal
     ezdan "전지전능한 야지디족의 신, 야즈단이지."
     show meru merong
-    ezdan "미안, 메루의 몸을 빌린 건 그 녀석이 가장 먼저 만들어진 스프라이트라서 그랬어."
+    ezdan "미안, 처음부터 내가 신인 걸 밝히고 오면 부담스러워 할까 봐."
+    show meru normal
+    ezdan "부득이하게 메루 모습을 좀 빌렸어. 그 아이도 허락했고."
     show meru confident
-    ezdan "우리 귀여운 야지디족 프로그래머가 대단한 일을 벌이고 있는데, 이걸 그냥 보고만 있기에는 엄청 아까운 것 같아서 여기에 한번 와 본거야."
+    ezdan "어쨌거나, 우리 귀여운 야지디족 프로그래머가 대단한 일을 벌이고 있는데, 이걸 그냥 보고만 있기에는 엄청 아까운 것 같아서 여기에 한번 와 본거야."
     show meru injang
     ezdan "이 모습을 그 애가 아닌 네가 보고 있다는 게 좀 웃기긴 하지만..."
     show meru normal
@@ -803,7 +839,7 @@ label merudistan_3:
     show meru confident
     ezdan "그럼 나중에 또 보자, [name]."
     show meru normal
-    ezdan "{i}Gerok, pêşde herin û riya xwe hilbijêrin.{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}"
+    ezdan "{i}{font=Caveat-VariableFont_wght.ttf}{size=100}Gerok, pêşde herin û riya xwe hilbijêrin.{/size}{/font}{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}"
 
     jump backto
 # 사건 99: 메루디스탄 (3)
@@ -855,6 +891,8 @@ label sleep:
             jump merudistan_3
     elif todream == "룰렛 TV쇼":
         jump roulette
+    elif todream == "박사님 무슨 문제라도?":
+        jump perwin
     else:
         "님 버그 발생했음 실수로 사건 가는걸 여기다 안넣었거나 잘못 타이핑한거임"
 # 꿈 이동 함수
