@@ -1,4 +1,6 @@
 ﻿# 이 파일에 게임 스크립트를 입력합니다.
+
+# 파이썬 코드
 init python:
     import random
     from dataclasses import dataclass
@@ -19,7 +21,7 @@ init python:
     enemyQui = 10 # 적 민첩도
     enemyEliment = "" #  적 속성
     
-    # 적 데이터클래스
+    ###### 적
     @dataclass
     class Enemy:
         name: str # 이름
@@ -29,6 +31,15 @@ init python:
         attack: int = 20 # 공격력
         defence: int = 10 # 방어력
         qui: int = 10 # 민첩도
+
+    # 적 정의
+    slime = Enemy(
+        name = "도트 슬라임",
+        ele = "디지털",
+        attack = 10,
+        defence = 5,
+        qui = 5
+    )
 
     #시스템
     area1 = "1" # 구역 1 목적지
@@ -63,7 +74,7 @@ init python:
         script: str
         effect: str
     
-    # 기물
+    ###### 기물
     @dataclass
     class Item:
         name: str #  기물 이름
@@ -108,15 +119,26 @@ init python:
         effect = "미묘한 기물"
     )
 
+    # 기물 템플릿
+
+    #기물이름 = Item(
+    #    name = "기물이름",
+    #    script = "기물설명",
+    #    type_i = "기물 특성",
+    #    effect = "기물 효과"
+    #)
+
     itemlist = [dreamcatcher, musicbox, hpEnhancer, WalletWarrior, sample009]
 
     # 기타 코드
     meru_process = 1 # 메루디스탄 사건 진척도.
 
-    # 함수
+    ###### 함수
 
     # 랜덤 아이템 뽑기(디버프 기물 포함)
     def real_randomitem():
+        if (dreamcatcher.own == True and musicbox.own == True and hpEnhancer.own == True and WalletWarrior.own == True and sample009.own == True):
+            return "noitem"
         item = random.choice(itemlist)
         while item.own == True:
             item = random.choice(itemlist)
@@ -135,6 +157,7 @@ init python:
             # 대미지 계산
             damage = enemyAtk(1/(1 + Def))
 
+# 렌파이 코드
 init:
     screen stat():
         frame:
@@ -158,6 +181,8 @@ init:
                 text "| [areanum]구역"
 
 # image 문을 사용해 이미지를 정의합니다.
+
+# 배경 이미지
 image room = "room_edited.png"
 image bg1 = "dreamspace.jpg"
 image bg2 = "spaceship.jpg"
@@ -166,8 +191,10 @@ image bank = "bank.jpg"
 image amste = "amsterdam.jpg"
 image tvshow = "tv_show.jpg"
 
+# 다스니 박사 이미지
 image perwin = "Perwin.png"
 
+# 주인공 이미지
 image tester normal = "Tester_default.png"
 image tester nonex = "Tester_0-0.png"
 image tester smile = "Tester_smile.png"
@@ -177,6 +204,7 @@ image tester injang = "Tester_-w-.png"
 image tester wut = "Tester_wut.png"
 image tester curious = "Tester_curious.png"
 
+# 메루 이미지
 image meru normal = "Meru_default.png"
 image meru confident = "Meru_UU.png"
 image meru injang = "Meru_-w-.png"
@@ -296,11 +324,15 @@ label Tutorial:
 
 label StandBy:
     hide screen stat
-    $ areanum = 0
-    $ floor = 1
-    $ ether = 200
-    if meru_process == "done":
-        $ meru_process = 1
+    python:
+        areanum = 0
+        floor = 1
+        ether = 200
+        if meru_process == "done":
+            meru_process = 1
+        for ait in itemlist:
+            ait.own = False
+    
     scene bg1 with dissolve
     menu:
         "무엇을 하실 건가요?"
@@ -606,15 +638,20 @@ label roulette:
     "사회자" "오늘의 우승자, [name]님은 어떤 상품을 가져가게 될까요?"
     "사회자" "[name]님, 앞의 룰렛을 돌려주세요!"
 
-    "근데 아무리 생각해도 이 를렛 좀 위험해 보이는데..."
+    "근데 아무리 생각해도 이 룰룰렛 좀 위험해 보이는데..."
     menu:
         "어떻게 하지?"
         "그래도 돌린다!":
             "사회자" "결과는...!"
             $ dice = real_randomitem()
-            "사회자" "축하합니다! {color=#7c4dff}[dice.name]{/color}(을)를 얻으셨군요!"
-            "[dice.name]: [dice.script]"
-            na "흠, 이거 좋은거 맞나?"
+            if dice == "noitem":
+                "룰렛이 돌아가다... 갑자기 부서졌다."
+                "사회자" "이런! 문제가 생겼군요. 죄송합니다. 대신 당신에게 {color=#7c4dff}500에테르{/color}를 드리겠습니다."
+                $ ether += 500
+            else:
+                "사회자" "축하합니다! {color=#7c4dff}[dice.name]{/color}(을)를 얻으셨군요!"
+                "[dice.name]: [dice.script]"
+                na "흠, 이거 좋은거 맞나?"
             scene black
             "그 순간, 갑자기 바닥이 꺼지고 어두운 바닥으로 떨어지면서..."
             "...그대로 꿈에서 벗어난다."
@@ -641,7 +678,7 @@ label template_dream:
             "선택지2"   
 
     jump backto
-# 사건 템플릿
+# 사건 0: 템플릿
 
 label merudistan:
     $ meru_process = 2
