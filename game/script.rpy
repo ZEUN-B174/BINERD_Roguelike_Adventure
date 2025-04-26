@@ -791,7 +791,7 @@ label merudistan_3:
     na "\"사창가가 있다니\"... 또야?"
     scene amste with dissolve
     "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
-    "길을 걷던 중, 이전과를 다르게 무척이나나 신비한 분위기를 풍기는 그 건물에 들어가 날 지그시 바라보는 메루와 마주친다."
+    "길을 걷던 중, 이전과를 다르게 무척이나 신비한 분위기를 풍기는 그 건물에 들어가 날 지그시 바라보는 메루와 마주친다."
     show meru confident with dissolve
     m "흐흥~ 또보네? 정말 끈질긴 인연이라니까~"
     show meru normal
