@@ -659,7 +659,7 @@ label perwin:
     scene black with dissolve
     "..."
     na "에? 박사님 무슨 일 생겼어요??"
-    scene bg1 with dissolve
+    scene bg2 with dissolve
     show perwin at left
     show tester nonex at right with easeinright
     p "..."
@@ -677,7 +677,7 @@ label perwin:
         "정기점검":
             "짝수 턴마다 공격력 + 20"
         "임시점검":
-            "사용 시, 공격력 + 30, 3번 사용 가능하며, 2턴동안 지속된된다."
+            "사용 시, 공격력 + 30, 3번 사용 가능하며, 2턴동안 지속된다."
         "연장점검":
             "20턴이 넘어갈 시, 공격력 + 40"
         "긴급점검":
@@ -689,7 +689,6 @@ label perwin:
     na "..."
     show tester wut
     extend "이런 미친"
-    hide tester with dissolve
     jump backto
 # 사건 3: 템플릿
 
