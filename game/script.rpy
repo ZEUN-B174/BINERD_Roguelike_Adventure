@@ -107,7 +107,7 @@ init python:
 
     WalletWarrior = Item(
         name = "지갑전사",
-        script = "다스니 연구소의 현실적인 기물. 에테르에 비례해서 공격력이 증가한다.",
+        script = "다스니 연구소의 게임계 기물. 에테르에 비례해서 공격력이 증가한다.",
         type_i = "일반",
         effect = "버프"
     )
@@ -117,6 +117,34 @@ init python:
         script = "연구소에서 체취한 꿈의 일부. 전투 시 일정 확률로 파괴되며, 파괴될 시 기이한 꿈을 꿀 수 있다.",
         type_i = "파괴 가능 기물",
         effect = "미묘한 기물"
+    )
+
+    regularSword = Item(
+        name = "정기점검",
+        script = "다스니 연구소의 게임계 기물. 짝수 턴마다 공격력이 20% 증가한다.",
+        type_i = "일반",
+        effect = "버프"
+    )
+
+    tempSword = Item(
+        name = "임시점검",
+        script = "다스니 연구소의 게임계 기물. 사용 시, 공격력이 30% 증가한다. 3번 사용 가능하며, 2턴동안 지속된다.",
+        type_i = "파괴 가능 기물",
+        effect = "버프"
+    )
+
+    extendSword = Item(
+        name = "연장점검",
+        script = "다스니 연구소의 게임계 기물. 20턴이 넘어갈 시, 공격력이 40 증가한다.",
+        type_i = "일반",
+        effect = "버프"
+    )
+
+    emergSword = Item(
+        name = "긴급점검",
+        script = "다스니 연구소의 게임계 기물. 사용 시, 공격력이 200% 증가한다. 단 1턴동안 지속된다.",
+        type_i = "파괴 가능 기물",
+        effect = "버프"
     )
 
     # 기물 템플릿
@@ -137,12 +165,19 @@ init python:
 
     # 랜덤 아이템 뽑기(디버프 기물 포함)
     def real_randomitem():
-        if (dreamcatcher.own == True and musicbox.own == True and hpEnhancer.own == True and WalletWarrior.own == True and sample009.own == True):
-            return "noitem"
-        item = random.choice(itemlist)
-        while item.own == True:
+        # 아이템이 하나라도 있는지 검증증
+        for i in itemlist:
+            if i.own == True:
+                item = "noitem"
+            else:
+                item = 1
+                break
+        # 아이템이 있을 때, 없는 아이템 중에서 뽑기
+        if item == 1:
             item = random.choice(itemlist)
-        item.own = True
+            while item.own == True:
+                item = random.choice(itemlist)
+            item.own = True
         return item
 
     # 아군 대미지 계산식(나에게 가해지는 대미지)
@@ -155,7 +190,19 @@ init python:
             damage = "회피"
         else:
             # 대미지 계산
-            damage = enemyAtk(1/(1 + Def))
+            damage = enemyAtk*(1/(1 + Def))
+
+    # 적 대미지 계산식(적에게 가해지는 대미지)
+    def enemyDamage():
+        global damage
+        # 공격 회피
+        chance = enemyQui - Qui
+        dice = random.randint(1, 100)
+        if dice <= chance:
+            damage = "회피"
+        else:
+            # 대미지 계산
+            damage = Atk*(1/(1 + enemyDef))
 
 # 렌파이 코드
 init:
@@ -163,14 +210,16 @@ init:
         frame:
             xpadding 50
             ypadding 50
-            align (0.075, 0.1)
-            grid 1 6:
+            xpos 150
+            ypos 150
+            grid 1 7:
                 text '체력'
                 bar value StaticValue(Hp, MaxHP) xalign 0.5 xsize 600
                 text '공격력: [Atk]'
                 text '방어력: [Def]'
                 text '에테르: [ether]'
-                text "[floor]차원 [areanum]구역"
+                text "[floor]차원"
+                text "[areanum]구역"
 
 # image 문을 사용해 이미지를 정의합니다.
 
@@ -207,7 +256,7 @@ define p = Character('페르윈 다스니', color="#fcb714")
 define a = Character('Mîxayîl', color="#514ed7")
 define na = Character("[name]", color="#565274")
 define m = Character('「메루」', color="#7c4dff")
-define m3ru = Character(who_bold=True, what_italic=True, what_xalign=0.5, what_textalign=0.5, what_color="#7c4dff", what_font="Caveat-VariableFont_wght.ttf", what_size=100)
+define m3ru = Character(who_bold=True, what_italic=True, what_color="#7c4dff", what_font="Caveat-VariableFont_wght.ttf", what_size=100)
 define ezdan = Character('야즈단', what_italic=True, color="#7c4dff")
 
 # 여기에서부터 게임이 시작합니다.
@@ -658,10 +707,11 @@ label roulette:
 label perwin:
     scene black with dissolve
     "..."
-    na "에? 박사님 무슨 일 생겼어요??"
+    na "응? 잠깐 이거 안들어가지지?"
     scene bg2 with dissolve
     show perwin at left
     show tester nonex at right with easeinright
+    na "박사님 무슨 일 생겼어요??"
     p "..."
     na "..."
     p "어, 그게..."
@@ -671,17 +721,29 @@ label perwin:
     "..."
     "......"
     show tester normal
-    p "자! 다 됐다! 점검 보상으로 셋 중에 하나 골라!"
+    p "자! 다 됐다! 점검 보상으로 여기 중에 하나 골라!"
 
     menu:
-        "정기점검":
-            "짝수 턴마다 공격력 + 20"
-        "임시점검":
-            "사용 시, 공격력 + 30, 3번 사용 가능하며, 2턴동안 지속된다."
-        "연장점검":
-            "20턴이 넘어갈 시, 공격력 + 40"
-        "긴급점검":
-            "사용 시, 공격력 + 200, 단 1턴동안 지속된다."
+        "정기점검" if regularSword.own == False:
+            "[regularSword.name]: [regularSword.script]"
+            $ regularSword.own = True
+
+        "임시점검" if tempSword.own == False:
+            "[tempSword.name]: [tempSword.script]"
+            $ tempSword.own = True
+
+        "연장점검" if extendSword.own == False:
+            "[extendSword.name]: [extendSword.script]"
+            $ extendSword.own = True
+
+        "긴급점검" if emergSword.own == False:
+            "[emergSword.name]: [emergSword.script]"
+            $ emergSword.own = True
+
+        "그냥 에테르 주세요":
+            "당신은 {color=#7c4dff}321에테르{/color}를 받았다."
+            $ ether += 321
+            
     p "그럼 이제 가볼게!!"
     hide perwin with easeoutleft
     show tester at center with ease
