@@ -19,7 +19,10 @@ init python:
     enemyAtk = 20 # 적 공격력
     enemyDef = 10 # 적 방어력
     enemyQui = 10 # 적 민첩도
-    enemyEliment = "" #  적 속성
+    enemyEliment = "" # 적 속성
+
+    # 기타
+    MAX_DMG = 2147483647
     
     ###### 적
     @dataclass
@@ -51,7 +54,8 @@ init python:
     dream1 = "a" # 사건 1 목적지
     dream2 = "b" # 사건 2 목적지
     dream3 = "c" # 사건 3 목적지
-    DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "박사님 무슨 문제라도?"]
+    DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "???"]
+    NoMeru = ["이세계 은행", "룰렛 TV쇼", "???"]
     todream = "none" # 사건 선택지 저장 변수
 
     damage = "" # 대미지 표시를 깔끔하게 하기 위한 변수
@@ -67,17 +71,26 @@ init python:
     HowManyWay = 0 # 꿈 선택지 숫자 정하기용
     mode = "none" # 게임모드
 
-    # 버프
+    ###### 버프
     @dataclass
     class Buff:
-        name: str
-        script: str
-        effect: str
+        name: str # 버프 이름
+        script: str # 버프 설명
+        effect: str # 버프 효과
+        own: bool = False # 버프을 소유하고 있는지 판단
+
+    # 기물 템플릿
+
+    #버프이름 = Buff(
+    #    name = "버프이름",
+    #    script = "버프설명",
+    #    effect = "버프 효과"
+    #)
     
     ###### 기물
     @dataclass
     class Item:
-        name: str #  기물 이름
+        name: str # 기물 이름
         script: str # 기물 설명
         effect: str # 기물 효과
         type_i: str # 기물 종류
@@ -163,46 +176,44 @@ init python:
 
     ###### 함수
 
-    # 랜덤 아이템 뽑기(디버프 기물 포함)
-    def real_randomitem():
-        # 아이템이 하나라도 있는지 검증증
-        for i in itemlist:
+    # 랜덤 뽑기
+    def get_random(object_list):
+        # 뽑을 거리가 하나라도 있는지 검증
+        for i in object_list:
             if i.own == True:
-                item = "noitem"
+                obj = "null"
             else:
-                item = 1
+                obj = 1
                 break
-        # 아이템이 있을 때, 없는 아이템 중에서 뽑기
-        if item == 1:
-            item = random.choice(itemlist)
-            while item.own == True:
-                item = random.choice(itemlist)
-            item.own = True
-        return item
+        # 뽑을 거리가 있을 때, 없는 것 중에서 뽑기
+        if obj == 1:
+            obj = random.choice(object_list)
+            while obj.own == True:
+                obj = random.choice(object_list)
+            obj.own = True
+        return obj
 
     # 아군 대미지 계산식(나에게 가해지는 대미지)
-    def myDamage():
-        global damage
+    def get_myDamage():
         # 공격 회피
         chance = Qui - enemyQui
         dice = random.randint(1, 100)
         if dice <= chance:
-            damage = "회피"
+            return "회피"
         else:
             # 대미지 계산
-            damage = enemyAtk*(1/(1 + Def))
+            return min(enemyAtk*(1/(1 + Def)), MAX_DMG)
 
     # 적 대미지 계산식(적에게 가해지는 대미지)
-    def enemyDamage():
-        global damage
+    def get_enemyDamage():
         # 공격 회피
         chance = enemyQui - Qui
         dice = random.randint(1, 100)
         if dice <= chance:
-            damage = "회피"
+            return "회피"
         else:
             # 대미지 계산
-            damage = Atk*(1/(1 + enemyDef))
+            return min(Atk*(1/(1 + enemyDef)), MAX_DMG)
 
 # 렌파이 코드
 init:
@@ -292,7 +303,7 @@ label start:
         "못 들어봤어요.":
             show tester injang
             p "아, 설명하기 귀찮은데."
-            p "그래도 말 안해주면 엄청 헷갈릴릴 테니까 잘 들어."
+            p "그래도 말 안해주면 엄청 헷갈릴 테니까 잘 들어."
             p "로그라이크는 간단히 말해서, 던전 탐험을 하면서 아이템을 얻고, 적과 싸우고, 보스를 처치하는 게임이야."
             p "대부분의 로그라이크는 던전이 랜덤으로 생성되고, 적도 랜덤으로 나오고, 아이템도 랜덤으로 나와."
             p "이런 요소가 로그라이크의 매력이기도 하지."
@@ -420,11 +431,7 @@ label special:
 
 label select2:
     scene bg3 with dissolve
-    python:
-        area1 = random.choice(AreaList)
-        area2 = random.choice(AreaList)
-        while (area1 == area2):
-            area2 = random.choice(AreaList)
+    $ area1, area2 = random.sample(AreaList, k=2)
     menu:
         "진입할 구역을 정해주세요."
         "[area1]":
@@ -437,14 +444,7 @@ label select2:
 
 label select3:
     scene bg3 with dissolve
-    python:
-        area1 = random.choice(AreaList)
-        area2 = random.choice(AreaList)
-        while (area1 == area2):
-            area2 = random.choice(AreaList)
-        area3 = random.choice(AreaList)
-        while (area1 == area3 or area2 == area3):
-            area3 = random.choice(AreaList)
+    $ area1, area2, area3 = random.sample(AreaList, k=3)
     menu:
         "진입할 구역을 정해주세요."
         "[area1]":
@@ -490,20 +490,14 @@ label happening:
         dreamed2 = False
         dreamed3 = False
 
-        dream1 = random.choice(DreamList)
-        while (dream1 == "메루디스탄" and meru_process == "done"):
-            dream1 = random.choice(DreamList)
-        
-        dream2 = random.choice(DreamList)
-        while (dream2 == "메루디스탄" and meru_process == "done"):
-            dream2 = random.choice(DreamList)
-        
-        dream3 = random.choice(DreamList)
-        while (dream3 == "메루디스탄" and meru_process == "done"):
-            dream3 = random.choice(DreamList)
-    
+        if meru_process == "done":
+            dream1, dream2, dream3 = random.sample(NoMeru, k=3)
+        else:
+            dream1, dream2, dream3 = random.sample(DreamList, k=3)
+
     jump backto
 
+# 꿈 선택지
 label SelectDream1:
     scene bg1 with dissolve
     menu:
@@ -512,6 +506,7 @@ label SelectDream1:
             $ todream = dream1
             $ dreamed1 = True
             jump sleep
+
         "꿈에서 깨기" if dreamed1 == True:
             jump RoadSign
 
@@ -523,10 +518,12 @@ label SelectDream2:
             $ todream = dream1
             $ dreamed1 = True
             jump sleep
+
         "[dream2]" if dreamed2 == False:
             $ todream = dream2
             $ dreamed2 = True
             jump sleep
+
         "꿈에서 깨기" if dreamed2 == True and dreamed3 == True:
             jump RoadSign
 
@@ -538,14 +535,17 @@ label SelectDream3:
             $ todream = dream1
             $ dreamed1 = True
             jump sleep
+
         "[dream2]" if dreamed1 == False and dreamed2 == False and dreamed3 == False:
             $ todream = dream2
             $ dreamed2 = True
             jump sleep
+
         "[dream3]" if dreamed1 == False and dreamed2 == False and dreamed3 == False:
             $ todream = dream3
             $ dreamed3 = True
             jump sleep
+
         "꿈에서 깨기" if dreamed1 == True or dreamed2 == True or dreamed3 == True:
             jump RoadSign
 # 이곳은 사건 구역의 끝입니다.
@@ -684,8 +684,8 @@ label roulette:
         "어떻게 하지?"
         "그래도 돌린다!":
             "사회자" "결과는...!"
-            $ dice = real_randomitem()
-            if dice == "noitem":
+            $ dice = get_random(itemlist)
+            if dice == "null":
                 "룰렛이 돌아가다... 갑자기 부서졌다."
                 "사회자" "이런! 문제가 생겼군요. 죄송합니다. 대신 당신에게 {color=#7c4dff}500에테르{/color}를 드리겠습니다."
                 $ ether += 500
@@ -716,7 +716,7 @@ label perwin:
     na "..."
     p "어, 그게..."
     show tester injang
-    extend "버그가 발생해서 잠깐 온 거야."
+    extend "버그가 발생해서."
     p "미안!! 얼른 고칠게!!"
     "..."
     "......"
@@ -848,8 +848,7 @@ label merudistan_3:
     $ meru_process = "done"
     scene black with dissolve
     "..."
-    na "하필이면 내가 가야 할 길에"
-    extend "..."
+    na "하필이면 내가 가야 할 길에..."
     na "\"사창가가 있다니\"... 또야?"
     scene amste with dissolve
     "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
@@ -943,19 +942,25 @@ label backto:
 label sleep:
     if todream == "이세계 은행":
         jump bank
-    elif todream == "메루디스탄": # 연계 이벤트 1
+
+    elif todream == "메루디스탄":
         if meru_process == 1:
             jump merudistan
         elif meru_process == 2:
             jump merudistan_2
         elif meru_process == 3:
             jump merudistan_3
+    # 연계 이벤트 1
+
     elif todream == "룰렛 TV쇼":
         jump roulette
-    elif todream == "박사님 무슨 문제라도?":
+
+    elif todream == "???":
         jump perwin
+
     else:
         "님 버그 발생했음 실수로 사건 가는걸 여기다 안넣었거나 잘못 타이핑한거임"
+        jump perwin
 # 꿈 이동 함수
 
 # GUI
