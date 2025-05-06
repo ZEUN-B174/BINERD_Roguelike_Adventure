@@ -89,8 +89,8 @@ define gui.title_text_size = 150
 ## 메인과 게임 메뉴들 ##################################################################
 
 ## 이미지들은 메인(main)과 게임 메뉴(game menu)에 사용됩니다.
-define gui.main_menu_background = "gui/main_menu.png"
-define gui.game_menu_background = "gui/game_menu.png"
+define gui.main_menu_background = "gui/perwin_main.png"
+define gui.game_menu_background = "gui/perwin_main.png"
 
 
 ## 대사 ##########################################################################

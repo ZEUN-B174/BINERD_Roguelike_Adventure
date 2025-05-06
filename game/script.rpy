@@ -24,6 +24,34 @@ init python:
     # 기타
     MAX_DMG = 2147483647
     
+    #시스템
+    area1 = "1" # 구역 1 목적지
+    area2 = "2" # 구역 2 목적지
+    area3 = "3" # 구역 3 목적지
+    AreaList = ["전투", "사건", "보상", "정예", "상점"]
+    togo = "none" # 목적지 저장 변수
+
+    dream1 = "a" # 사건 1 목적지
+    dream2 = "b" # 사건 2 목적지
+    dream3 = "c" # 사건 3 목적지
+
+    DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "???"]
+    NoMeru = ["이세계 은행", "룰렛 TV쇼", "???"]
+
+    todream = "none" # 사건 선택지 저장 변수
+    damage = "" # 대미지 표시를 깔끔하게 하기 위한 변수
+
+    #선택지 중복 방지용
+    dreamed1 = False
+    dreamed2 = False
+    dreamed3 = False
+
+    floor = 1 # 층 수
+    areanum = 0 #구역 번호
+    dice = 0 # 랜덤이벤트에 쓸 주사위
+    HowManyWay = 0 # 꿈 선택지 숫자 정하기용
+    mode = "none" # 게임모드
+    
     ###### 적
     @dataclass
     class Enemy:
@@ -43,33 +71,6 @@ init python:
         defence = 5,
         qui = 5
     )
-
-    #시스템
-    area1 = "1" # 구역 1 목적지
-    area2 = "2" # 구역 2 목적지
-    area3 = "3" # 구역 3 목적지
-    AreaList = ["전투", "사건", "보상", "정예", "상점"]
-    togo = "none" # 목적지 저장 변수
-
-    dream1 = "a" # 사건 1 목적지
-    dream2 = "b" # 사건 2 목적지
-    dream3 = "c" # 사건 3 목적지
-    DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "???"]
-    NoMeru = ["이세계 은행", "룰렛 TV쇼", "???"]
-    todream = "none" # 사건 선택지 저장 변수
-
-    damage = "" # 대미지 표시를 깔끔하게 하기 위한 변수
-
-    #선택지 중복 방지용
-    dreamed1 = False
-    dreamed2 = False
-    dreamed3 = False
-
-    floor = 1 # 층 수
-    areanum = 0 #구역 번호
-    dice = 0 # 랜덤이벤트에 쓸 주사위
-    HowManyWay = 0 # 꿈 선택지 숫자 정하기용
-    mode = "none" # 게임모드
 
     ###### 버프
     @dataclass
@@ -266,6 +267,8 @@ image meru merong = "Meru_merong.png"
 define p = Character('페르윈 다스니', color="#fcb714")
 define a = Character('Mîxayîl', color="#514ed7")
 define na = Character("[name]", color="#565274")
+define ny = Character('니알리', color="#c5293e")
+
 define m = Character('「메루」', color="#7c4dff")
 define m3ru = Character(who_bold=True, what_italic=True, what_color="#7c4dff", what_font="Caveat-VariableFont_wght.ttf", what_size=100)
 define ezdan = Character('야즈단', what_italic=True, color="#7c4dff")
@@ -754,6 +757,30 @@ label perwin:
     jump backto
 # 사건 3: 템플릿
 
+label dreamland:
+    scene black with dissolve
+    "..."
+    na "내가 드림랜드에 오다니... 믿기지가 않는군."
+    scene bg1 with dissolve
+    "당신은 신비로운 분위기의 지평선 앞에 서 있다."
+    "그리고 기다란 하얀색 촉수가 있는 한 사람?과 마주친다."
+
+    ny "흐음? 인간이 여기에 오는 건 오랜만이군."
+    ny "난 니알라토텝. 그냥 니알리라고 불러."
+    ny "여기엔 어쩐 일로 온 거야? 이렇게 인간한테 위험한 곳에 말이지."
+
+    "어느새 수많은 적들이 당신 곁을 둘러싸고 있는 걸 발견한다."
+
+    menu:
+        ny "어떻게 할래?"
+        "Choice 1":
+            "선택지1"
+        "Choice 2":
+            "선택지2"   
+
+    jump backto
+# 사건 0: 템플릿
+
 label template_dream:
     scene black with dissolve
     "..."
@@ -789,7 +816,7 @@ label merudistan:
     "메루? 페르윈의 친구인 그 매춘부 아닌가?"
     show meru normal
     m "흐흥, 멀티버스에 대해서 들어본 적 있니?"
-    m "어떤 사람은 날 쿠르디스탄의 귀여운 아이돌이나 창녀 쯤으으로 알고있겠지만, 난 그녀석과는 본질부터 달라."
+    m "어떤 사람은 날 쿠르디스탄의 귀여운 아이돌이나 창녀 쯤으로 알고있겠지만, 난 그녀석과는 본질부터 달라."
     m "운명의 선지자, 위대한 하늘의 대리자. 사람들은 날 이렇게 부르지."
     show meru confident
     m "뭐, 그래도 이렇게 마주친 기념으로 선물을 하나 줄게. 골라봐."
