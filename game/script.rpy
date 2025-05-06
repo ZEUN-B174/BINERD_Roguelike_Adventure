@@ -13,6 +13,9 @@ init python:
     Qui = 10 # 민첩도
     ether = 200 # 에테르
 
+    # 초기화 안되는 소모품
+    etherium = 0 # 에테리움
+
     # 적 스테이터스
     enemyMaxHP = 100 # 적 최대체력
     enemyHp = 100 # 적 현재체력
@@ -35,8 +38,8 @@ init python:
     dream2 = "b" # 사건 2 목적지
     dream3 = "c" # 사건 3 목적지
 
-    DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "???"]
-    NoMeru = ["이세계 은행", "룰렛 TV쇼", "???"]
+    DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "드림랜드", "???"]
+    NoMeru = ["이세계 은행", "룰렛 TV쇼", "드림랜드", "???"]
 
     todream = "none" # 사건 선택지 저장 변수
     damage = "" # 대미지 표시를 깔끔하게 하기 위한 변수
@@ -413,6 +416,9 @@ label MainGame:
 # 이곳은 로딩화면의 끝입니다.
 
 label report:
+    $ solid_ether = ether // 10
+    "[ether]에테르 >> [solid_ether]에테리움"
+    $ etherium += solid_ether
     "보고서 닫기"
     jump StandBy
 
@@ -755,7 +761,7 @@ label perwin:
     show tester wut
     extend "이런 미친"
     jump backto
-# 사건 3: 템플릿
+# 사건 3: 다스니 박사의 실수
 
 label dreamland:
     scene black with dissolve
@@ -771,15 +777,22 @@ label dreamland:
 
     "어느새 수많은 적들이 당신 곁을 둘러싸고 있는 걸 발견한다."
 
+    $ dice = random.randint(1, 10)
     menu:
         ny "어떻게 할래?"
-        "Choice 1":
-            "선택지1"
-        "Choice 2":
-            "선택지2"   
+        "그냥 꿈에서 깨어날래: 100에테르를 얻는다." if dice == 2:
+            ny "쳇, 아쉽게됐네."
+            "꿈에서 벗어난 당신 손에는 빛나는 {color=#7c4dff}100mL의 에테르{/color}가 쥐어져 있었다."
+            $ ether += 100
+        "네 계략이지?: 정예 적 「니알라토텝」과 전투를 한다. 3★ 버프 1개와 2★아이템 1개를 얻는다." if dice == 4:
+            ny "정답~ 그치만 이제 싸워야 할 적은 내가 되는데?"
+        "날 도와줘: 낮은 난이도의 전투를 하고 1~2★ 버프 3개를 얻는다.":
+            ny "인간, 내가 특별히 이번에만 도와주는거야?"
+        "나 혼자서 할래: 높은 난이도의 전투를 하고 1~2★ 버프 3개와 2★아이템 1개를 얻는다.":
+            ny "그래, 네가 죽든 말든 내 일 아니니까 맘대로 해."
 
     jump backto
-# 사건 0: 템플릿
+# 사건 4: 드림랜드의 니알라토텝(전투)
 
 label template_dream:
     scene black with dissolve
@@ -793,7 +806,7 @@ label template_dream:
         "Choice 1":
             "선택지1"
         "Choice 2":
-            "선택지2"   
+            "선택지2"
 
     jump backto
 # 사건 0: 템플릿
@@ -981,6 +994,9 @@ label sleep:
 
     elif todream == "룰렛 TV쇼":
         jump roulette
+
+    elif todream == "드림랜드":
+        jump dreamland
 
     elif todream == "???":
         jump perwin

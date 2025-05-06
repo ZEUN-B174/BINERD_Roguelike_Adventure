@@ -1,15 +1,15 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
-While processing text tag {size} in '{i}{font=Caveat-VariableFont_wght.ttf}{size=100}Gerok, pêşde herin û riya xwe hilbijêrin.{size}{/font}{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}'.:
-  File "game/script.rpy", line 798, in script
-    ezdan "{i}{font=Caveat-VariableFont_wght.ttf}{size=100}Gerok, pêşde herin û riya xwe hilbijêrin.{size}{/font}{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}"
-Exception: empty value supplied for tag 'size'
+While processing text tag {ether} in '{ether}에테르 >> {solid_ether}에테리움'.:
+  File "game/script.rpy", line 420, in script
+    "{ether}에테르 >> {solid_ether}에테리움"
+Exception: Unknown text tag 'ether'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 798, in script
-    ezdan "{i}{font=Caveat-VariableFont_wght.ttf}{size=100}Gerok, pêşde herin û riya xwe hilbijêrin.{size}{/font}{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}"
+  File "game/script.rpy", line 420, in script
+    "{ether}에테르 >> {solid_ether}에테리움"
   File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 2586, in execute
     Say.execute(self)
   File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 623, in execute
@@ -56,19 +56,15 @@ Full traceback:
     surf = render(child,
   File "render.pyx", line 170, in renpy.display.render.render
   File "render.pyx", line 260, in renpy.display.render.render
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\layout.py", line 900, in render
-    surf = render(child, width, height, cst, cat)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 260, in renpy.display.render.render
   File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\text\text.py", line 2627, in render
     virtual_layout = Layout(self, width, height, renders, drawable_res=False, size_only=True)
   File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\text\text.py", line 739, in __init__
     self.paragraphs = self.segment(text.tokens, style, renders, text)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\text\text.py", line 1415, in segment
-    raise Exception("empty value supplied for tag %r" % tag)
-Exception: empty value supplied for tag 'size'
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\text\text.py", line 1541, in segment
+    raise Exception("Unknown text tag %r" % text)
+Exception: Unknown text tag 'ether'
 
 Windows-10-10.0.26100 AMD64
 Ren'Py 8.3.7.25031702
-비네르드: 로그라이크 어드벤처 1.0
-Sat Apr 26 23:49:07 2025
+비네르드: 로그라이크 어드벤처 0.1
+Wed May  7 00:34:59 2025
