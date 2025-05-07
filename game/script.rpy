@@ -83,7 +83,7 @@ init python:
         effect: str # 버프 효과
         own: bool = False # 버프을 소유하고 있는지 판단
 
-    # 기물 템플릿
+    # 아이템 템플릿
 
     #버프이름 = Buff(
     #    name = "버프이름",
@@ -91,16 +91,16 @@ init python:
     #    effect = "버프 효과"
     #)
     
-    ###### 기물
+    ###### 아이템
     @dataclass
     class Item:
-        name: str # 기물 이름
-        script: str # 기물 설명
-        effect: str # 기물 효과
-        type_i: str # 기물 종류
-        own: bool = False # 기물을 소유하고 있는지 판단
+        name: str # 아이템 이름
+        script: str # 아이템 설명
+        effect: str # 아이템 효과
+        type_i: str # 아이템 종류
+        own: bool = False # 아이템을 소유하고 있는지 판단
 
-    # 기물 정의
+    # 아이템 정의
     dreamcatcher = Item(
         name = "드림캐쳐",
         script = "신비로운 문양의 드림캐쳐. 악몽 속성 적에게 가하는 피해가 20% 증가한다.",
@@ -110,21 +110,21 @@ init python:
 
     musicbox = Item(
         name = "미분음 오르골",
-        script = "12음계에서 벗어난 신비한 음을 연주하는 오르골. 꿈 계열 기물의 효과가 2배가 된다.",
+        script = "12음계에서 벗어난 신비한 음을 연주하는 오르골. 꿈 계열 아이템의 효과가 2배가 된다.",
         type_i = "일반",
         effect = "버프"
     )
 
     hpEnhancer = Item(
         name = "체력 증진기 #22",
-        script = "다스니 연구소의 체력계 기물. 전투 진입 시, 체력이 2배가 된다.",
+        script = "다스니 연구소의 체력계 아이템. 전투 진입 시, 체력이 2배가 된다.",
         type_i = "일반",
         effect = "버프"
     )
 
     WalletWarrior = Item(
         name = "지갑전사",
-        script = "다스니 연구소의 게임계 기물. 에테르에 비례해서 공격력이 증가한다.",
+        script = "다스니 연구소의 게임계 아이템. 에테르에 비례해서 공격력이 증가한다.",
         type_i = "일반",
         effect = "버프"
     )
@@ -132,45 +132,45 @@ init python:
     sample009 = Item(
         name = "꿈바다 샘플 #009",
         script = "연구소에서 체취한 꿈의 일부. 전투 시 일정 확률로 파괴되며, 파괴될 시 기이한 꿈을 꿀 수 있다.",
-        type_i = "파괴 가능 기물",
-        effect = "미묘한 기물"
+        type_i = "파괴 가능 아이템",
+        effect = "미묘한 아이템"
     )
 
     regularSword = Item(
         name = "정기점검",
-        script = "다스니 연구소의 게임계 기물. 짝수 턴마다 공격력이 20% 증가한다.",
+        script = "다스니 연구소의 게임계 아이템. 짝수 턴마다 공격력이 20% 증가한다.",
         type_i = "일반",
         effect = "버프"
     )
 
     tempSword = Item(
         name = "임시점검",
-        script = "다스니 연구소의 게임계 기물. 사용 시, 공격력이 30% 증가한다. 3번 사용 가능하며, 2턴동안 지속된다.",
-        type_i = "파괴 가능 기물",
+        script = "다스니 연구소의 게임계 아이템. 사용 시, 공격력이 30% 증가한다. 3번 사용 가능하며, 2턴동안 지속된다.",
+        type_i = "파괴 가능 아이템",
         effect = "버프"
     )
 
     extendSword = Item(
         name = "연장점검",
-        script = "다스니 연구소의 게임계 기물. 20턴이 넘어갈 시, 공격력이 40 증가한다.",
+        script = "다스니 연구소의 게임계 아이템. 20턴이 넘어갈 시, 공격력이 40 증가한다.",
         type_i = "일반",
         effect = "버프"
     )
 
     emergSword = Item(
         name = "긴급점검",
-        script = "다스니 연구소의 게임계 기물. 사용 시, 공격력이 200% 증가한다. 단 1턴동안 지속된다.",
-        type_i = "파괴 가능 기물",
+        script = "다스니 연구소의 게임계 아이템. 사용 시, 공격력이 200% 증가한다. 단 1턴동안 지속된다.",
+        type_i = "파괴 가능 아이템",
         effect = "버프"
     )
 
-    # 기물 템플릿
+    # 아이템 템플릿
 
-    #기물이름 = Item(
-    #    name = "기물이름",
-    #    script = "기물설명",
-    #    type_i = "기물 특성",
-    #    effect = "기물 효과"
+    #아이템이름 = Item(
+    #    name = "아이템이름",
+    #    script = "아이템설명",
+    #    type_i = "아이템 특성",
+    #    effect = "아이템 효과"
     #)
 
     itemlist = [dreamcatcher, musicbox, hpEnhancer, WalletWarrior, sample009]
@@ -340,10 +340,10 @@ label start:
     p "뭐, 어차피 공식이 중요한 게 아니라 이정도에서 넘어갈게."
     p "이제 에테르에 대해서 설명해줄게."
     p "에테르는 내 시뮬레이션에서 사용하는 재화야."
-    p "거래 구역에서 상품을 구매하거나, 「어떤 기물」 에서 중요하게 쓰이기도 하지."
+    p "거래 구역에서 상품을 구매하거나, 「어떤 아이템」 에서 중요하게 쓰이기도 하지."
     
     show tester curious
-    na "그 기물이 뭔가요?"
+    na "그 아이템이 뭔가요?"
     show tester normal
 
     p "그건 비밀!"
@@ -367,7 +367,7 @@ label Tutorial:
     a "상단에는 체력과 공격력, 방어력, 에테르가 보이고, 하단에는 현재 층과 구역이 보입니다."
     hide screen stat
     a "이건 이쯤에서 넘어가고, 다음으로 박사님이 제대로 말하지 않은 구역에 대해서 설명해드릴게요."
-    a "상점 구역: 에테르를 소비해 원하는 기물이나 버프를 구매할 수 있습니다."
+    a "상점 구역: 에테르를 소비해 원하는 아이템이나 버프를 구매할 수 있습니다."
     a "정예 구역: 전투 구역보다 더 강한 적을 마주치고, 보상도 전투 구역보다 더 많이 나옵니다."
     a "보상 구역: 사건 구역과 비슷하지만, 더 좋은 보상이 나오고, 안좋은 사건은 뜨지 않습니다."
     a "이것 외에도 전설로만 여겨지는 미개척 구역이 있긴 한데...{w=.7} 이건 거의 볼 일이 없을 테니 신경 안쓰셔도 됩니다."
@@ -410,7 +410,7 @@ label MainGame:
     show screen stat
     if mode == "tutorial":
         a "시뮬레이션으로 제대로 들어오셨군요."
-        a "처음 시뮬레이션으로 들어오면 버프 3개와 기물 1개를 기본으로 받게 된답니다."
+        a "처음 시뮬레이션으로 들어오면 버프 3개와 아이템 1개를 기본으로 받게 된답니다."
         a "시뮬레이션은 혼자 돌아다니기엔 위험하니 이걸 챙기길 바라요."
     jump select3
 # 이곳은 로딩화면의 끝입니다.
@@ -756,7 +756,7 @@ label perwin:
     p "그럼 이제 가볼게!!"
     hide perwin with easeoutleft
     show tester at center with ease
-    na "박사님, 기물 이름이 왜..."
+    na "박사님, 아이템 이름이 왜..."
     na "..."
     show tester wut
     extend "이런 미친"
