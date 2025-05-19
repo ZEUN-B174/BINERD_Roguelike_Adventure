@@ -282,6 +282,7 @@ label start:
     $ name = renpy.call_screen("set_name",title="여기에 이름을 입력하면 돼.", init_name="테스터")
     scene room with dissolve
 
+    play music "Evening of Tel Aviv.mp3"
     show tester nonex at right with easeinright
     show perwin at left
 
@@ -356,6 +357,7 @@ label start:
     na "..."
     show tester injang
     na "뭐, 어떻게든 되겠지."
+    stop music fadeout 1.0
 
 label Tutorial:
     scene bg1 with dissolve
@@ -631,6 +633,7 @@ label pioneer:
     a "..."
     a "......"
     a "실행 완료."
+    play music "Unexplored Area.mp3" fadein 1.0
     scene bg1 with dissolve
     show screen stat
     if mode == "tutorial":
@@ -643,6 +646,7 @@ label pioneer:
 
     $ areanum = 0
     $ floor = 3
+    stop music fadeout 1.0
     jump select3
 # 이곳은 미개척 구역의 끝입니다.
 
@@ -651,6 +655,7 @@ label bank:
     scene black with dissolve
     "..."
     na "...은행이 이세계에 있는 한, 어쩔 수 없지."
+    play music "Clockwise Clockwork (Variation).mp3"
     scene bank with dissolve
     "그렇게 당신은 말이 통하지 않는 이세계의 은행에 도착했습니다."
     "여기에서 저축한 돈 {color=#7c4dff}300에테르{/color}를 돌려받기 위해서말이죠."
@@ -676,6 +681,7 @@ label bank:
                 "은행 직원" "Ez nikarim fêm bikim ka hûn çi dibêjin."
                 "은행 직원은 나에게 아무것도 주지 않았다."
 
+    stop music fadeout 1.0
     jump backto
 # 사건 1: 이세계 은행
 
@@ -683,6 +689,7 @@ label roulette:
     scene black with dissolve
     "..."
     na "역시, TV 프로그램에 나오길 잘한거같아."
+    play music "Theater Street.mp3" fadein 1.0
     scene tvshow with dissolve
     "사회자" "신사 숙녀 여러분, 드디어 가장 재미있는 시간이 돌아왔습니다!"
     "사회자" "오늘의 우승자, [name]님은 어떤 상품을 가져가게 될까요?"
@@ -702,10 +709,12 @@ label roulette:
                 "사회자" "축하합니다! {color=#7c4dff}[dice.name]{/color}(을)를 얻으셨군요!"
                 "[dice.name]: [dice.script]"
                 na "흠, 이거 좋은거 맞나?"
+            stop music
             scene black
             "그 순간, 갑자기 바닥이 꺼지고 어두운 바닥으로 떨어지면서..."
             "...그대로 꿈에서 벗어난다."
         "돌리지 않는다":
+            stop music
             scene black
             "그 순간, 꿈이 일그러지며 뒤틀리고, 꿈에서 쫓겨나게 된다."
             "다행히 나에게는 아무 이상도 없다."
@@ -767,6 +776,7 @@ label dreamland:
     scene black with dissolve
     "..."
     na "내가 드림랜드에 오다니... 믿기지가 않는군."
+    play music "Imaginary World.mp3" fadein 1.0
     scene bg1 with dissolve
     "당신은 신비로운 분위기의 지평선 앞에 서 있다."
     "그리고 기다란 하얀색 촉수가 있는 한 사람?과 마주친다."
@@ -791,6 +801,7 @@ label dreamland:
         "나 혼자서 할래: 높은 난이도의 전투를 하고 1~2★ 버프 3개와 2★아이템 1개를 얻는다.":
             ny "그래, 네가 죽든 말든 내 일 아니니까 맘대로 해."
 
+    stop music fadeout 1.0
     jump backto
 # 사건 4: 드림랜드의 니알라토텝(전투)
 
@@ -816,6 +827,7 @@ label merudistan:
     scene black with dissolve
     "..."
     na "하필이면 내가 가야 할 길에 사창가가 껴있다니."
+    play music "Mysterious Dreams.mp3" fadein 1.0
     scene amste with dissolve
     "어쩔 수 없이 나는 어느 사창가에 들어서게 되었다."
     "길을 걷던 중, 무의식적으로 들어간 건물에서 고급진 테이블 앞에 앉아 타로 카드로 점을 보고 있는 한 여자와 마주친다."
@@ -847,6 +859,7 @@ label merudistan:
     show meru normal
     m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}{font=DungGeunMo.ttf}{size=60}방랑자여, 앞으로 나아가 길을 선택하거라.{/size}{/font}"
 
+    stop music fadeout 1.0
     jump backto
 # 사건 99: 메루디스탄 (1)
 
@@ -856,6 +869,7 @@ label merudistan_2:
     "..."
     na "하필이면 내가 가야 할 길에 사창가가..."
     na "응? 또야?"
+    play music "Mysterious Dreams.mp3" fadein 1.0
     scene amste with dissolve
     "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
     "길을 걷던 중, 신비로운 분위기를 풍기던 그 건물에 들어가 지루하다는 듯이 타로카드를 보던 「메루」와 마주친다."
@@ -881,6 +895,7 @@ label merudistan_2:
     show meru normal
     m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}{font=DungGeunMo.ttf}{size=60}방랑자여, 앞으로 나아가 길을 선택하거라.{/size}{/font}"
 
+    stop music fadeout 1.0
     jump backto
 # 사건 99: 메루디스탄 (2)
 
@@ -890,6 +905,7 @@ label merudistan_3:
     "..."
     na "하필이면 내가 가야 할 길에..."
     na "\"사창가가 있다니\"... 또야?"
+    play music "Mysterious Dreams.mp3" fadein 1.0
     scene amste with dissolve
     "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
     "길을 걷던 중, 이전과를 다르게 무척이나 신비한 분위기를 풍기는 그 건물에 들어가 날 지그시 바라보는 메루와 마주친다."
@@ -941,6 +957,7 @@ label merudistan_3:
     show meru normal
     ezdan "{i}{font=Caveat-VariableFont_wght.ttf}{size=100}Gerok, pêşde herin û riya xwe hilbijêrin.{/size}{/font}{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}"
 
+    stop music fadeout 1.0
     jump backto
 # 사건 99: 메루디스탄 (3)
 
