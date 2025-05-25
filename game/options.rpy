@@ -149,7 +149,7 @@ define config.save_directory = "BINERD_Dungeon_Adventure-1744433827"
 ##
 ## 작업 표시 줄 또는 독에 표시되는 아이콘.
 
-define config.window_icon = "gui/window_icon.png"
+define config.window_icon = "gui/perwin_icon.png"
 
 
 ## 빌드 구성 #######################################################################
@@ -184,8 +184,8 @@ init python:
 
     ## 파일을 아카이브하려면 'archive'로 분류하십시오.
 
-    # build.classify('game/**.png', 'archive')
-    # build.classify('game/**.jpg', 'archive')
+    build.classify('game/**.png', 'archive')
+    build.classify('game/**.jpg', 'archive')
 
     ## 파일들의 매칭 문서 패턴은 맥앱(Mac App) 빌드에서 중복되므로 app 및 zip 파
     ## 일에 모두 나타납니다.
