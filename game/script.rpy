@@ -282,7 +282,7 @@ label start:
     $ name = renpy.call_screen("set_name",title="여기에 이름을 입력하면 돼.", init_name="테스터")
     scene room with dissolve
 
-    play music "Evening of Tel Aviv.mp3"
+    play music "Binary Simulation.wav"
     show tester nonex at right with easeinright
     show perwin at left
 
@@ -410,6 +410,7 @@ label StandBy:
 label MainGame:
     scene bg1 with dissolve
     show screen stat
+    play music "Unexplored Area.mp3"
     if mode == "tutorial":
         a "시뮬레이션으로 제대로 들어오셨군요."
         a "처음 시뮬레이션으로 들어오면 버프 3개와 아이템 1개를 기본으로 받게 된답니다."
@@ -505,7 +506,8 @@ label happening:
             dream1, dream2, dream3 = random.sample(NoMeru, k=3)
         else:
             dream1, dream2, dream3 = random.sample(DreamList, k=3)
-
+    
+    stop music fadeout 1.0
     jump backto
 
 # 꿈 선택지
@@ -633,7 +635,7 @@ label pioneer:
     a "..."
     a "......"
     a "실행 완료."
-    play music "Unexplored Area.mp3" fadein 1.0
+    play music "Dream Dungeon.wav" fadein 1.0
     scene bg1 with dissolve
     show screen stat
     if mode == "tutorial":
@@ -827,7 +829,7 @@ label merudistan:
     scene black with dissolve
     "..."
     na "하필이면 내가 가야 할 길에 사창가가 껴있다니."
-    play music "Mysterious Dreams.mp3" fadein 1.0
+    play music "Time Dilation.wav" fadein 1.0
     scene amste with dissolve
     "어쩔 수 없이 나는 어느 사창가에 들어서게 되었다."
     "길을 걷던 중, 무의식적으로 들어간 건물에서 고급진 테이블 앞에 앉아 타로 카드로 점을 보고 있는 한 여자와 마주친다."
@@ -869,7 +871,7 @@ label merudistan_2:
     "..."
     na "하필이면 내가 가야 할 길에 사창가가..."
     na "응? 또야?"
-    play music "Mysterious Dreams.mp3" fadein 1.0
+    play music "Time Dilation.wav" fadein 1.0
     scene amste with dissolve
     "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
     "길을 걷던 중, 신비로운 분위기를 풍기던 그 건물에 들어가 지루하다는 듯이 타로카드를 보던 「메루」와 마주친다."
@@ -905,7 +907,7 @@ label merudistan_3:
     "..."
     na "하필이면 내가 가야 할 길에..."
     na "\"사창가가 있다니\"... 또야?"
-    play music "Mysterious Dreams.mp3" fadein 1.0
+    play music "Time Dilation (VIP).wav" fadein 1.0
     scene amste with dissolve
     "어쩔 수 없이 나는 또 사창가에 들어서게 되었다."
     "길을 걷던 중, 이전과를 다르게 무척이나 신비한 분위기를 풍기는 그 건물에 들어가 날 지그시 바라보는 메루와 마주친다."
@@ -978,6 +980,7 @@ label destination:
 # 도착지 함수
 
 label RoadSign:
+    play music "Unexplored Area.mp3"
     $ dice = random.randint(0, 1)
     if areanum == 8:
         jump boss
