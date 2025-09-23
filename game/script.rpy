@@ -227,11 +227,12 @@ init:
             ypadding 50
             xpos 150
             ypos 150
-            grid 1 7:
+            grid 1 8:
                 text '체력'
                 bar value StaticValue(Hp, MaxHP) xalign 0.5 xsize 600
                 text '공격력: [Atk]'
                 text '방어력: [Def]'
+                text '민첩도: [Qui]'
                 text '에테르: [ether]'
                 text "[floor]차원"
                 text "[areanum]구역"
@@ -625,6 +626,7 @@ label BossBattle:
 label pioneer:
     scene black
     hide screen stat
+    stop music
     $ areanum = "-2147483647"
     $ floor = "7KSR6rCE6rOE"
     a "..."
@@ -651,6 +653,11 @@ label pioneer:
     stop music fadeout 1.0
     jump select3
 # 이곳은 미개척 구역의 끝입니다.
+
+##### 시스템
+
+# 전투 시스템
+label battleSystem:
 
 # 사건 구역 이벤트
 label bank:
