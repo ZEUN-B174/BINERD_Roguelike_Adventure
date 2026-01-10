@@ -1,70 +1,26 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
-While processing text tag {ether} in '{ether}에테르 >> {solid_ether}에테리움'.:
-  File "game/script.rpy", line 420, in script
-    "{ether}에테르 >> {solid_ether}에테리움"
-Exception: Unknown text tag 'ether'
+While running game code:
+  File "game/script.rpy", line 260, in script
+    python:
+  File "game/script.rpy", line 266, in <module>
+    for ait in itemlist:
+NameError: name 'itemlist' is not defined
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 420, in script
-    "{ether}에테르 >> {solid_ether}에테리움"
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 2586, in execute
-    Say.execute(self)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 623, in execute
-    renpy.exports.say(who, what, *args, **kwargs)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\exports\sayexports.py", line 132, in say
-    who(what, *args, **kwargs)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\character.py", line 1471, in __call__
-    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\character.py", line 1117, in do_display
-    display_say(who,
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\character.py", line 814, in display_say
-    rv = renpy.ui.interact(mouse='say', type=type, roll_forward=roll_forward)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ui.py", line 301, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\core.py", line 2218, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\core.py", line 2882, in interact_core
-    self.draw_screen(root_widget, fullscreen_video, (not fullscreen_video) or video_frame_drawn)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\core.py", line 1384, in draw_screen
-    surftree = renpy.display.render.render_screen(
-  File "render.pyx", line 486, in renpy.display.render.render_screen
-  File "render.pyx", line 260, in renpy.display.render.render
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\layout.py", line 900, in render
-    surf = render(child, width, height, cst, cat)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 260, in renpy.display.render.render
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\layout.py", line 900, in render
-    surf = render(child, width, height, cst, cat)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 260, in renpy.display.render.render
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\layout.py", line 900, in render
-    surf = render(child, width, height, cst, cat)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 260, in renpy.display.render.render
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\screen.py", line 755, in render
-    child = renpy.display.render.render(self.child, w, h, st, at)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 260, in renpy.display.render.render
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\layout.py", line 900, in render
-    surf = render(child, width, height, cst, cat)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 260, in renpy.display.render.render
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\layout.py", line 1457, in render
-    surf = render(child,
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 260, in renpy.display.render.render
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\text\text.py", line 2627, in render
-    virtual_layout = Layout(self, width, height, renders, drawable_res=False, size_only=True)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\text\text.py", line 739, in __init__
-    self.paragraphs = self.segment(text.tokens, style, renders, text)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\text\text.py", line 1541, in segment
-    raise Exception("Unknown text tag %r" % text)
-Exception: Unknown text tag 'ether'
+  File "game/script.rpy", line 260, in script
+    python:
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 834, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\python.py", line 1187, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "game/script.rpy", line 266, in <module>
+    for ait in itemlist:
+NameError: name 'itemlist' is not defined
 
-Windows-10-10.0.26100 AMD64
+Windows-10-10.0.26200 AMD64
 Ren'Py 8.3.7.25031702
 비네르드: 로그라이크 어드벤처 0.1
-Wed May  7 00:34:59 2025
+Sun Jan 11 00:15:21 2026

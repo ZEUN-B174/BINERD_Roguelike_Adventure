@@ -5,41 +5,55 @@ init python:
     import random
     from dataclasses import dataclass
 
-    # 플레이어 스테이터스
-    MaxHP = 100 # 최대체력
-    Hp = 100 # 현재체력
-    Atk = 20 # 공격력
-    Def = 10 # 방어력
-    Qui = 10 # 민첩도
-    ether = 200 # 에테르
+    @dataclass
+    class Entity:
+        maxHp: int
+        hp: int
+        atk: int
+        defence: int
+        agi: int
+        skillCoef: float
 
-    # 초기화 안되는 소모품
-    etherium = 0 # 에테리움
+    @dataclass
+    class Player(Entity):
+        attackFrequency: int
+        ether: int
+        etherium: int
 
-    # 적 스테이터스
-    enemyMaxHP = 100 # 적 최대체력
-    enemyHp = 100 # 적 현재체력
-    enemyAtk = 20 # 적 공격력
-    enemyDef = 10 # 적 방어력
-    enemyQui = 10 # 적 민첩도
-    enemyEliment = "" # 적 속성
+    @dataclass
+    class Enemy(Entity):
+        name: str
+        attackFrequency: int = 1
 
-    # 기타
-    MAX_DMG = 2147483647
+    # 플레이어 초기화
+    player = Player(
+        maxHp = 100,
+        hp = 100,
+        atk = 10,
+        defence = 5,
+        agi = 10,
+        skillCoef = 1.0,
+        attackFrequency = 1,
+        ether = 200,
+        etherium = 0
+    )
+
+    # 적 리스트
+    enemyList = []
     
-    #시스템
+    # 시스템
     area1 = "1" # 구역 1 목적지
     area2 = "2" # 구역 2 목적지
     area3 = "3" # 구역 3 목적지
-    AreaList = ["전투", "사건", "보상", "정예", "상점"]
+    areaList = ["전투", "사건", "보상", "정예", "상점"]
     togo = "none" # 목적지 저장 변수
 
     dream1 = "a" # 사건 1 목적지
     dream2 = "b" # 사건 2 목적지
     dream3 = "c" # 사건 3 목적지
 
-    DreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "드림랜드", "???"]
-    NoMeru = ["이세계 은행", "룰렛 TV쇼", "드림랜드", "???"]
+    dreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "???"]
+    noMeru = ["이세계 은행", "룰렛 TV쇼", "???"]
 
     todream = "none" # 사건 선택지 저장 변수
     damage = "" # 대미지 표시를 깔끔하게 하기 위한 변수
@@ -50,190 +64,41 @@ init python:
     dreamed3 = False
 
     floor = 1 # 층 수
-    areanum = 0 #구역 번호
+    areanum = 0 # 구역 번호
     dice = 0 # 랜덤이벤트에 쓸 주사위
-    HowManyWay = 0 # 꿈 선택지 숫자 정하기용
+    howManyWay = 0 # 꿈 선택지 숫자 정하기용
     mode = "none" # 게임모드
-    
-    ###### 적
-    @dataclass
-    class Enemy:
-        name: str # 이름
-        ele: str # 속성
-        max_hp: int = 100 # 최대체력
-        hp: int = 100 # 현재체력
-        attack: int = 20 # 공격력
-        defence: int = 10 # 방어력
-        qui: int = 10 # 민첩도
-
-    # 적 정의
-    slime = Enemy(
-        name = "도트 슬라임",
-        ele = "디지털",
-        attack = 10,
-        defence = 5,
-        qui = 5
-    )
-
-    ###### 버프
-    @dataclass
-    class Buff:
-        name: str # 버프 이름
-        script: str # 버프 설명
-        effect: str # 버프 효과
-        own: bool = False # 버프을 소유하고 있는지 판단
-
-    # 아이템 템플릿
-
-    #버프이름 = Buff(
-    #    name = "버프이름",
-    #    script = "버프설명",
-    #    effect = "버프 효과"
-    #)
-    
-    ###### 아이템
-    @dataclass
-    class Item:
-        name: str # 아이템 이름
-        script: str # 아이템 설명
-        effect: str # 아이템 효과
-        type_i: str # 아이템 종류
-        own: bool = False # 아이템을 소유하고 있는지 판단
-
-    # 아이템 정의
-    dreamcatcher = Item(
-        name = "드림캐쳐",
-        script = "신비로운 문양의 드림캐쳐. 악몽 속성 적에게 가하는 피해가 20% 증가한다.",
-        type_i = "일반",
-        effect = "버프"
-    )
-
-    musicbox = Item(
-        name = "미분음 오르골",
-        script = "12음계에서 벗어난 신비한 음을 연주하는 오르골. 꿈 계열 아이템의 효과가 2배가 된다.",
-        type_i = "일반",
-        effect = "버프"
-    )
-
-    hpEnhancer = Item(
-        name = "체력 증진기 #22",
-        script = "다스니 연구소의 체력계 아이템. 전투 진입 시, 체력이 2배가 된다.",
-        type_i = "일반",
-        effect = "버프"
-    )
-
-    WalletWarrior = Item(
-        name = "지갑전사",
-        script = "다스니 연구소의 게임계 아이템. 에테르에 비례해서 공격력이 증가한다.",
-        type_i = "일반",
-        effect = "버프"
-    )
-
-    sample009 = Item(
-        name = "꿈바다 샘플 #009",
-        script = "연구소에서 체취한 꿈의 일부. 전투 시 일정 확률로 파괴되며, 파괴될 시 기이한 꿈을 꿀 수 있다.",
-        type_i = "파괴 가능 아이템",
-        effect = "미묘한 아이템"
-    )
-
-    regularSword = Item(
-        name = "정기점검",
-        script = "다스니 연구소의 게임계 아이템. 짝수 턴마다 공격력이 20% 증가한다.",
-        type_i = "일반",
-        effect = "버프"
-    )
-
-    tempSword = Item(
-        name = "임시점검",
-        script = "다스니 연구소의 게임계 아이템. 사용 시, 공격력이 30% 증가한다. 3번 사용 가능하며, 2턴동안 지속된다.",
-        type_i = "파괴 가능 아이템",
-        effect = "버프"
-    )
-
-    extendSword = Item(
-        name = "연장점검",
-        script = "다스니 연구소의 게임계 아이템. 20턴이 넘어갈 시, 공격력이 40 증가한다.",
-        type_i = "일반",
-        effect = "버프"
-    )
-
-    emergSword = Item(
-        name = "긴급점검",
-        script = "다스니 연구소의 게임계 아이템. 사용 시, 공격력이 200% 증가한다. 단 1턴동안 지속된다.",
-        type_i = "파괴 가능 아이템",
-        effect = "버프"
-    )
-
-    # 아이템 템플릿
-
-    #아이템이름 = Item(
-    #    name = "아이템이름",
-    #    script = "아이템설명",
-    #    type_i = "아이템 특성",
-    #    effect = "아이템 효과"
-    #)
-
-    itemlist = [dreamcatcher, musicbox, hpEnhancer, WalletWarrior, sample009]
 
     # 기타 코드
     meru_process = 1 # 메루디스탄 사건 진척도.
 
     ###### 함수
 
-    # 랜덤 뽑기
-    def get_random(object_list):
-        # 뽑을 거리가 하나라도 있는지 검증
-        for i in object_list:
-            if i.own == True:
-                obj = "null"
-            else:
-                obj = 1
-                break
-        # 뽑을 거리가 있을 때, 없는 것 중에서 뽑기
-        if obj == 1:
-            obj = random.choice(object_list)
-            while obj.own == True:
-                obj = random.choice(object_list)
-            obj.own = True
-        return obj
-
-    # 아군 대미지 계산식(나에게 가해지는 대미지)
-    def get_myDamage():
-        # 공격 회피
-        chance = Qui - enemyQui
-        dice = random.randint(1, 100)
-        if dice <= chance:
-            return "회피"
-        else:
-            # 대미지 계산
-            return min(enemyAtk*(1/(1 + Def)), MAX_DMG)
-
-    # 적 대미지 계산식(적에게 가해지는 대미지)
-    def get_enemyDamage():
-        # 공격 회피
-        chance = enemyQui - Qui
-        dice = random.randint(1, 100)
-        if dice <= chance:
-            return "회피"
-        else:
-            # 대미지 계산
-            return min(Atk*(1/(1 + enemyDef)), MAX_DMG)
+    # 대미지 계산식
+    def getDamage(attacker, defender, stat):
+        dodge_chance = defender.agi / (attacker.agi + defender.agi)
+        if random.random() < dodge_chance:
+            return 0  # 회피 성공 시 대미지 0
+        dmg = stat * attacker.skillCoef * (100 / (100 + defender.defence))
+        return int(dmg)
 
 # 렌파이 코드
 init:
     screen stat():
         frame:
+            xanchor 0
+            yanchor 0
             xpadding 50
             ypadding 50
             xpos 150
             ypos 150
-            grid 1 8:
+            grid 1 8 spacing 10:
                 text '체력'
-                bar value StaticValue(Hp, MaxHP) xalign 0.5 xsize 600
-                text '공격력: [Atk]'
-                text '방어력: [Def]'
-                text '민첩도: [Qui]'
-                text '에테르: [ether]'
+                bar value StaticValue(player.hp, player.maxHp) xalign 0.5 xsize 600
+                text '공격력: [player.atk]'
+                text '방어력: [player.defence]'
+                text '민첩도: [player.agi]'
+                text '에테르: [player.ether]'
                 text "[floor]차원"
                 text "[areanum]구역"
 
@@ -271,7 +136,6 @@ image meru merong = "Meru_merong.png"
 define p = Character('페르윈 다스니', color="#fcb714")
 define a = Character('Mîxayîl', color="#514ed7")
 define na = Character("[name]", color="#565274")
-define ny = Character('니알리', color="#c5293e")
 
 define m = Character('「메루」', color="#7c4dff")
 define m3ru = Character(who_bold=True, what_italic=True, what_color="#7c4dff", what_font="Caveat-VariableFont_wght.ttf", what_size=100)
@@ -319,7 +183,7 @@ label start:
 
     show tester normal
     p "어쨌든 이걸 물어본 이유가 내가 만든 시뮬레이션이 로그라이크의 요소를 채용해서 그렇거든."
-    p "내 시뮬레이션은 간단해.{w=.7} 다양한 방을 지나면서 각종 버프를 얻어 보스몹을 물리치는 게 목표야."
+    p "내 시뮬레이션은 간단해.{w=.7} 다양한 방을 지나면서 각종 스킬를 얻어 보스몹을 물리치는 게 목표야."
     p "아마 호요버스에서 만든 붕괴: 스타레일의 시뮬레이션 우주와 비슷할거야.{w=.7} 사실 거기서 영감을 얻어서 만들었거든."
     p "크흠, 아무튼!{w=.7} 시작하게 되면 넌 3개의 구역 중 하나로 들어갈 수 있어."
     p "내 시뮬레이션에는 여러 가지의 구역이 있는데, 낮은 난이도의 전투를 할 수 있는 전투 구역과 다양한 사건이 발생하는 사건 구역이 있어."
@@ -338,7 +202,7 @@ label start:
 
     p "다음으로 전투에 대해서 설명해줄게."
     p "대미지는 간단하게 공격력에서 방어력을 뺀 만큼 들어가.{w=.7}..게 할 예정이었는데 아무래도 대미지가 아예 안들어가는게 좀 거시기해서 말이지."
-    p "현재 쓰는 식은 이거야.{p=.7}대미지 = 공격력*(1/(1+방어력))"
+    p "현재 쓰는 식은 이거야.{p=.7}대미지 = 공격력*(100/(100+방어력))"
     p "뭐, 어차피 공식이 중요한 게 아니라 이정도에서 넘어갈게."
     p "이제 에테르에 대해서 설명해줄게."
     p "에테르는 내 시뮬레이션에서 사용하는 재화야."
@@ -370,7 +234,7 @@ label Tutorial:
     a "상단에는 체력과 공격력, 방어력, 에테르가 보이고, 하단에는 현재 층과 구역이 보입니다."
     hide screen stat
     a "이건 이쯤에서 넘어가고, 다음으로 박사님이 제대로 말하지 않은 구역에 대해서 설명해드릴게요."
-    a "상점 구역: 에테르를 소비해 원하는 아이템이나 버프를 구매할 수 있습니다."
+    a "상점 구역: 에테르를 소비해 원하는 아이템이나 스킬를 구매할 수 있습니다."
     a "정예 구역: 전투 구역보다 더 강한 적을 마주치고, 보상도 전투 구역보다 더 많이 나옵니다."
     a "보상 구역: 사건 구역과 비슷하지만, 더 좋은 보상이 나오고, 안좋은 사건은 뜨지 않습니다."
     a "이것 외에도 전설로만 여겨지는 미개척 구역이 있긴 한데...{w=.7} 이건 거의 볼 일이 없을 테니 신경 안쓰셔도 됩니다."
@@ -388,11 +252,16 @@ label StandBy:
     python:
         areanum = 0
         floor = 1
-        ether = 200
+        player.maxHp = 100
+        player.hp = player.maxHp
+        player.atk = 10
+        player.defence = 5
+        player.agi = 10
+        player.attackFrequency = 1
+        player.ether = 200
+
         if meru_process == "done":
             meru_process = 1
-        for ait in itemlist:
-            ait.own = False
     
     scene bg1 with dissolve
     menu:
@@ -414,15 +283,15 @@ label MainGame:
     play music "Unexplored Area.mp3"
     if mode == "tutorial":
         a "시뮬레이션으로 제대로 들어오셨군요."
-        a "처음 시뮬레이션으로 들어오면 버프 3개와 아이템 1개를 기본으로 받게 된답니다."
+        a "처음 시뮬레이션으로 들어오면 스킬 3개와 아이템 1개를 기본으로 받게 된답니다."
         a "시뮬레이션은 혼자 돌아다니기엔 위험하니 이걸 챙기길 바라요."
     jump select3
 # 이곳은 로딩화면의 끝입니다.
 
 label report:
-    $ solid_ether = ether // 10
-    "[ether]에테르 >> [solid_ether]에테리움"
-    $ etherium += solid_ether
+    $ solid_ether = player.ether // 10
+    "[player.ether]에테르 >> [solid_ether]에테리움"
+    $ player.etherium += solid_ether
     "보고서 닫기"
     jump StandBy
 
@@ -444,7 +313,7 @@ label special:
 
 label select2:
     scene bg3 with dissolve
-    $ area1, area2 = random.sample(AreaList, k=2)
+    $ area1, area2 = random.sample(areaList, k=2)
     menu:
         "진입할 구역을 정해주세요."
         "[area1]":
@@ -457,7 +326,7 @@ label select2:
 
 label select3:
     scene bg3 with dissolve
-    $ area1, area2, area3 = random.sample(AreaList, k=3)
+    $ area1, area2, area3 = random.sample(areaList, k=3)
     menu:
         "진입할 구역을 정해주세요."
         "[area1]":
@@ -490,11 +359,11 @@ label happening:
     scene bg2 with dissolve
 
     a "사건 구역에 진입했습니다."
-    $ HowManyWay = random.randint(1, 3)
-    "당신의 앞에는 [HowManyWay]갈래의 꿈으로 향하는 문이 있습니다."
-    if HowManyWay == 1:
+    $ howManyWay = random.randint(1, 3)
+    "당신의 앞에는 [howManyWay]갈래의 꿈으로 향하는 문이 있습니다."
+    if howManyWay == 1:
         "눈앞의 꿈으로 나아가봅시다."
-    elif HowManyWay == 2:
+    elif howManyWay == 2:
         "당신은 어떤 꿈을 먼저 경험할 지 정해야 합니다."
     else:
         "당신은 어떤 꿈을 경험할 지 정해야 합니다."
@@ -504,9 +373,9 @@ label happening:
         dreamed3 = False
 
         if meru_process == "done":
-            dream1, dream2, dream3 = random.sample(NoMeru, k=3)
+            dream1, dream2, dream3 = random.sample(noMeru, k=3)
         else:
-            dream1, dream2, dream3 = random.sample(DreamList, k=3)
+            dream1, dream2, dream3 = random.sample(dreamList, k=3)
     
     stop music fadeout 1.0
     jump backto
@@ -676,16 +545,16 @@ label bank:
             if (dice <= 5):
                 "은행 직원" "Ji ber vê yekê we teserûfên xwe paşde xwest."
                 "은행 직원은 나에게 {color=#7c4dff}300에테르{/color}를 주었다."
-                $ ether += 300
+                $ player.ether += 300
             else:
                 "은행 직원" "Ma hûn dixwazin hin teserûfên xwe paşde bistînin?"
                 "은행 직원은 나에게 {color=#7c4dff}100에테르{/color}를 주었다."
-                $ ether += 100
+                $ player.ether += 100
         "주변에서 사람들이 하는 말을 대충 끼워맞춘다.":
             if (dice > 7):
                 "은행 직원" "Ji ber vê yekê we dixwest ku teserûfên xwe plus faîzê paşde bistînin."
                 "은행 직원은 나에게 {color=#7c4dff}500에테르{/color}를 주었다."
-                $ ether += 500
+                $ player.ether += 500
             else:
                 "은행 직원" "Ez nikarim fêm bikim ka hûn çi dibêjin."
                 "은행 직원은 나에게 아무것도 주지 않았다."
@@ -709,15 +578,9 @@ label roulette:
         "어떻게 하지?"
         "그래도 돌린다!":
             "사회자" "결과는...!"
-            $ dice = get_random(itemlist)
-            if dice == "null":
-                "룰렛이 돌아가다... 갑자기 부서졌다."
-                "사회자" "이런! 문제가 생겼군요. 죄송합니다. 대신 당신에게 {color=#7c4dff}500에테르{/color}를 드리겠습니다."
-                $ ether += 500
-            else:
-                "사회자" "축하합니다! {color=#7c4dff}[dice.name]{/color}(을)를 얻으셨군요!"
-                "[dice.name]: [dice.script]"
-                na "흠, 이거 좋은거 맞나?"
+            $ dice = random.randint(1, 6)
+            "사회자" "축하합니다! {color=#7c4dff}[dice*100]에테르{/color}(을)를 얻으셨군요!"
+            $ player.ether += dice * 100
             stop music
             scene black
             "그 순간, 갑자기 바닥이 꺼지고 어두운 바닥으로 떨어지면서..."
@@ -751,25 +614,9 @@ label perwin:
     p "자! 다 됐다! 점검 보상으로 여기 중에 하나 골라!"
 
     menu:
-        "정기점검" if regularSword.own == False:
-            "[regularSword.name]: [regularSword.script]"
-            $ regularSword.own = True
-
-        "임시점검" if tempSword.own == False:
-            "[tempSword.name]: [tempSword.script]"
-            $ tempSword.own = True
-
-        "연장점검" if extendSword.own == False:
-            "[extendSword.name]: [extendSword.script]"
-            $ extendSword.own = True
-
-        "긴급점검" if emergSword.own == False:
-            "[emergSword.name]: [emergSword.script]"
-            $ emergSword.own = True
-
-        "그냥 에테르 주세요":
+        "에테르 주세요":
             "당신은 {color=#7c4dff}321에테르{/color}를 받았다."
-            $ ether += 321
+            $ player.ether += 321
             
     p "그럼 이제 가볼게!!"
     hide perwin with easeoutleft
@@ -780,39 +627,6 @@ label perwin:
     extend "이런 미친"
     jump backto
 # 사건 3: 다스니 박사의 실수
-
-label dreamland:
-    scene black with dissolve
-    "..."
-    na "내가 드림랜드에 오다니... 믿기지가 않는군."
-    play music "Imaginary World.mp3" fadein 1.0
-    scene bg1 with dissolve
-    "당신은 신비로운 분위기의 지평선 앞에 서 있다."
-    "그리고 기다란 하얀색 촉수가 있는 한 사람?과 마주친다."
-
-    ny "흐음? 인간이 여기에 오는 건 오랜만이군."
-    ny "난 니알라토텝. 그냥 니알리라고 불러."
-    ny "여기엔 어쩐 일로 온 거야? 이렇게 인간한테 위험한 곳에 말이지."
-
-    "어느새 수많은 적들이 당신 곁을 둘러싸고 있는 걸 발견한다."
-
-    $ dice = random.randint(1, 10)
-    menu:
-        ny "어떻게 할래?"
-        "그냥 꿈에서 깨어날래: 100에테르를 얻는다." if dice == 2:
-            ny "쳇, 아쉽게됐네."
-            "꿈에서 벗어난 당신 손에는 빛나는 {color=#7c4dff}100mL의 에테르{/color}가 쥐어져 있었다."
-            $ ether += 100
-        "네 계략이지?: 정예 적 「니알라토텝」과 전투를 한다. 3★ 버프 1개와 2★아이템 1개를 얻는다." if dice == 4:
-            ny "정답~ 그치만 이제 싸워야 할 적은 내가 되는데?"
-        "날 도와줘: 낮은 난이도의 전투를 하고 1~2★ 버프 3개를 얻는다.":
-            ny "인간, 내가 특별히 이번에만 도와주는거야?"
-        "나 혼자서 할래: 높은 난이도의 전투를 하고 1~2★ 버프 3개와 2★아이템 1개를 얻는다.":
-            ny "그래, 네가 죽든 말든 내 일 아니니까 맘대로 해."
-
-    stop music fadeout 1.0
-    jump backto
-# 사건 4: 드림랜드의 니알라토텝(전투)
 
 label template_dream:
     scene black with dissolve
@@ -857,11 +671,11 @@ label merudistan:
     show meru normal
     menu gift:
         "[[황금빛 바클라바]: 모든 축복을 획득한다.":
-            $ Atk += 1000
-            $ Def += 1000
-            $ Qui += 100
+            $ player.atk += 1000
+            $ player.defence += 1000
+            $ player.agi += 100
         "[[정제된 농축 에테르]: 2000에테르를 획득한다.":
-            $ ether += 2000
+            $ player.ether += 2000
     
     show meru confident
     m "그럼 나중에 인연이 되면 또 보자."
@@ -895,9 +709,9 @@ label merudistan_2:
     show meru normal
     menu:
         "[[꿈결 비단]: 방어력이 100 증가한다.":
-            $ Def += 100
+            $ player.defence += 100
         "[[금실을 엮는 바늘]: 공격력이 100 증가한다.":
-            $ Atk += 100     
+            $ player.atk += 100     
     
     show meru confident
     m "그럼 나중에 또 보자."
@@ -998,9 +812,9 @@ label RoadSign:
 # 선택지 수량 함수 
 
 label backto:
-    if HowManyWay == 1:
+    if howManyWay == 1:
         jump SelectDream1
-    elif HowManyWay == 2:
+    elif howManyWay == 2:
         jump SelectDream2
     else:
         jump SelectDream3
@@ -1021,9 +835,6 @@ label sleep:
 
     elif todream == "룰렛 TV쇼":
         jump roulette
-
-    elif todream == "드림랜드":
-        jump dreamland
 
     elif todream == "???":
         jump perwin
