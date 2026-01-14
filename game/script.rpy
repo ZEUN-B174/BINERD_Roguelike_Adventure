@@ -18,6 +18,7 @@ init python:
     class Player(Entity):
         healCoef: float
         attackFrequency: int
+        dodgeChance: float
 
     @dataclass
     class Enemy(Entity):
@@ -34,6 +35,7 @@ init python:
         skillCoef = 1.0,
         healCoef = 0.1,
         attackFrequency = 1,
+        dodgeChance = 0.5
     )
 
     # 적 관련 변수
@@ -46,10 +48,43 @@ init python:
         Enemy(name="드래곤", maxHp=300, hp=300, atk=25, defence=15, agi=10, skillCoef=1.2)
     ]
     enemyQueue = []
+    enemyDodgeChance = 0.2
 
+    # 버프 관련 클래스
+    @dataclass
+    class Buff:
+        name: str
+        description: str
+        def apply(self, amount: int):
+            pass
+    
+    @dataclass
+    class HpBuff(Buff):
+        def apply(self, amount: int):
+            player.maxHp += amount
+            player.hp += amount
+
+    @dataclass
+    class AtkBuff(Buff):
+        def apply(self, amount: int):
+            player.atk += amount
+
+    @dataclass
+    class DefBuff(Buff):
+        def apply(self, amount: int):
+            player.defence += amount
+
+    @dataclass
+    class AgiBuff(Buff):
+        def apply(self, amount: int):
+            player.agi += amount
+
+    
     # 시스템
     ether = 200
     etherium = 0
+
+    tutorialCleared = False
 
     area1 = "1" # 구역 1 목적지
     area2 = "2" # 구역 2 목적지
@@ -85,19 +120,20 @@ init python:
     ###### 함수
 
     # 대미지 계산식
-    def getDamage(attacker, defender, stat):
-        dodge_chance = defender.agi / (attacker.agi + defender.agi)
-        if random.random() < dodge_chance:
-            return 0  # 회피 성공 시 대미지 0
+    def getDamage(attacker, defender, stat, dodgeChance=0.4):
+        if random.random() < dodgeChance:
+            dodge_success_rate = defender.agi / (attacker.agi + defender.agi)
+            if random.random() < dodge_success_rate:
+                return 0  # 회피 성공 시 대미지 0
         dmg = stat * attacker.skillCoef * (100 / (100 + defender.defence))
-        return int(dmg)
+        return max(int(dmg), 1)  # 최소 대미지 1 보장
 
     def attackByPlayer():
         global damage, totalDamage
         totalDamage = 0
 
         for i in range(player.attackFrequency):
-            damage = getDamage(player, enemy, player.atk)
+            damage = getDamage(player, enemy, player.atk, player.dodgeChance)
             enemy.hp -= damage
             totalDamage += damage
             if enemy.hp < 0:
@@ -105,7 +141,7 @@ init python:
 
     def attackByEnemy():
         global damage
-        damage = getDamage(enemy, player, enemy.atk)
+        damage = getDamage(enemy, player, enemy.atk, enemyDodgeChance)
         player.hp -= damage
         if player.hp < 0:
             player.hp = 0
@@ -125,24 +161,33 @@ init:
             ypadding 50
             xpos 150
             ypos 150
-            grid 2 7 spacing 10:
-                text '체력'
-                bar value StaticValue(player.hp, player.maxHp) xalign 0.5 xsize 600
+            vbox:
+                spacing 10
 
-                text '공격력'
-                text '[player.atk]'
+                hbox:
+                    vbox:
+                        spacing 10
+                        text '공격력: '
+                        text '방어력: '
+                        text '민첩도: '
+                        text '에테르: '
+                        text '체력'
 
-                text '방어력'
-                text '[player.defence]'
+                    vbox:
+                        spacing 10
 
-                text '민첩도'
-                text '[player.agi]'
+                        text '[player.atk]'
+                        text '[player.defence]'
+                        text '[player.agi]'
+                        text '[ether]'
+                        hbox:
+                            bar value StaticValue(player.hp, player.maxHp) xalign 0.5 xsize 600
+                            null width 10
+                            text '[player.hp]/[player.maxHp]'
+                
+                text ''
+                text "[floor]차원 [areanum]구역"
 
-                text '에테르'
-                text '[ether]'
-
-                text "[floor]차원"
-                text "[areanum]구역"
 
     screen battle_stat():
         frame:
@@ -152,18 +197,20 @@ init:
             ypadding 50
             xpos 3690
             ypos 150
-            grid 2 4 spacing 10:
+            vbox:
+                spacing 10
+
                 text '[enemy.name]'
-                text ''
+                null height 10
 
-                text '적 체력'
-                bar value StaticValue(enemy.hp, enemy.maxHp) xalign 0.5 xsize 600
+                hbox:
+                    spacing 10
+                    text '체력 '
+                    bar value StaticValue(enemy.hp, enemy.maxHp) xalign 0.5 xsize 600
+                    null width 5
+                    text '[enemy.hp]/[enemy.maxHp]'
 
-                text '적 공격력'
-                text '[enemy.atk]'
-                
-                text '적 방어력'
-                text '[enemy.defence]'
+                text '공격력: [enemy.atk] | 방어력: [enemy.defence]'
 
     screen player_stat():
         frame:
@@ -173,18 +220,20 @@ init:
             ypadding 50
             xpos 150
             ypos 2010
-            grid 2 4 spacing 10:
+            vbox:
+                spacing 10
+
                 text '[name]'
-                text ''
+                null height 10
 
-                text '플레이어 체력'
-                bar value StaticValue(player.hp, player.maxHp) xalign 0.5 xsize 600
+                hbox:
+                    spacing 10
+                    text '체력 '
+                    bar value StaticValue(player.hp, player.maxHp) xalign 0.5 xsize 600
+                    null width 5
+                    text '[player.hp]/[player.maxHp]'
 
-                text '플레이어 공격력'
-                text '[player.atk]'
-
-                text '플레이어 방어력'
-                text '[player.defence]'
+                text '공격력: [player.atk] | 방어력: [player.defence]'
 
 # image 문을 사용해 이미지를 정의합니다.
 
@@ -285,9 +334,8 @@ label start:
     show tester normal
 
     p "다음으로 전투에 대해서 설명해줄게."
-    p "대미지는 간단하게 공격력에서 방어력을 뺀 만큼 들어가.{w=.7}..게 할 예정이었는데 아무래도 대미지가 아예 안들어가는게 좀 거시기해서 말이지."
-    p "현재 쓰는 식은 이거야.{p=.7}대미지 = 공격력*(100/(100+방어력))"
-    p "뭐, 어차피 공식이 중요한 게 아니라 이정도에서 넘어갈게."
+    p "사실 엄청 간단한 턴제 전투라서 별로 설명해줄게 없긴 한데..."
+    p "매 턴마다 공격이나 회복을 선택할 수 있고... 아직까진 그게 다야."
     p "이제 에테르에 대해서 설명해줄게."
     p "에테르는 내 시뮬레이션에서 사용하는 재화야."
     p "거래 구역에서 상품을 구매하거나, 「어떤 아이템」 에서 중요하게 쓰이기도 하지."
@@ -323,10 +371,10 @@ label Tutorial:
     a "보상 구역: 사건 구역과 비슷하지만, 더 좋은 보상이 나오고, 안좋은 사건은 뜨지 않습니다."
     a "이것 외에도 전설로만 여겨지는 미개척 구역이 있긴 한데...{w=.7} 이건 거의 볼 일이 없을 테니 신경 안쓰셔도 됩니다."
     a "일단 어느정도 감을 잡으셨을 테니 시작해봐요."
-    a "일단, 스토리 모드를 먼저 플레이해보세요."
+    a "일단, 튜토리얼 모드를 먼저 플레이해보세요."
     menu:
         "무엇을 하실 건가요?"
-        "스토리 모드":
+        "튜토리얼 모드":
             $ mode = "tutorial"
             jump MainGame
 # 이곳은 튜토리얼의 끝입니다.
@@ -342,6 +390,9 @@ label StandBy:
         player.defence = 5
         player.agi = 10
         player.attackFrequency = 1
+        player.skillCoef = 1.0
+        player.healCoef = 0.1
+        player.dodgeChance = 0.5
         ether = 200
 
         if meru_process == "done":
@@ -350,13 +401,16 @@ label StandBy:
     scene bg1 with dissolve
     menu:
         "무엇을 하실 건가요?"
-        "스토리 모드":
+        "튜토리얼 모드" if tutorialCleared == False:
+            $ mode = "tutorial"
+            jump MainGame
+        "스토리 모드" if tutorialCleared == True:
             $ mode = "story"
             jump MainGame
-        "무한 모드":
+        "무한 모드" if tutorialCleared == True:
             $ mode = "infinite"
             jump MainGame
-        "쿠르드어 모드":
+        "쿠르드어 모드" if tutorialCleared == True:
             $ mode = "kurdi"
             jump MainGame
 # 이곳은 메인화면의 끝입니다.
@@ -448,7 +502,7 @@ label happening:
             dream1, dream2, dream3 = random.sample(dreamList, k=3)
     
     stop music fadeout 1.0
-    jump backto
+    jump backToSelect
 
 # 꿈 선택지
 label SelectDream1:
@@ -461,7 +515,7 @@ label SelectDream1:
             jump sleep
 
         "꿈에서 깨기" if dreamed1 == True:
-            jump RoadSign
+            jump roadSign_bgmChange
 
 label SelectDream2:
     scene bg1 with dissolve
@@ -478,7 +532,7 @@ label SelectDream2:
             jump sleep
 
         "꿈에서 깨기" if dreamed2 == True and dreamed3 == True:
-            jump RoadSign
+            jump roadSign_bgmChange
 
 label SelectDream3:
     scene bg1 with dissolve
@@ -500,7 +554,7 @@ label SelectDream3:
             jump sleep
 
         "꿈에서 깨기" if dreamed1 == True or dreamed2 == True or dreamed3 == True:
-            jump RoadSign
+            jump roadSign_bgmChange
 # 이곳은 사건 구역의 끝입니다.
 
 label store:
@@ -508,13 +562,7 @@ label store:
     scene bg2 with dissolve
     a "상점 구역에 진입했습니다."
 
-    $ dice = random.randint(0, 1)
-    if areanum == 8:
-        jump boss
-    elif dice == 0:
-        jump select2
-    else:
-        jump select3
+    jump roadSign
 # 이곳은 상점 구역의 끝입니다.
 
 label reward:
@@ -522,13 +570,7 @@ label reward:
     scene bg2 with dissolve
     a "보상 구역에 진입했습니다."
 
-    $ dice = random.randint(0, 1)
-    if areanum == 8:
-        jump boss
-    elif dice == 0:
-        jump select2
-    else:
-        jump select3
+    jump roadSign
 # 이곳은 보상 구역의 끝입니다.
 
 label battle:
@@ -539,50 +581,60 @@ label battle:
 
     python:
         enemyQueue.clear()
-        enemyNum = random.randint(1, 3)
+        enemyNum = random.randint(2, 4)
         for i in range(enemyNum):
             enemyQueue.append(random.choice(enemyList))
         enemy = enemyQueue[0]
+        enemy.hp = enemy.maxHp
 
+    $ dice = random.randint(1, 2)
+    if dice == 1:
+        play music "WKTKFGKRHTLVEK.wav" fadein 1.0
+    else:
+        play music "DUNGEON_WKTKF.wav" fadein 1.0
     show screen battle_stat()
     show screen player_stat()
     while len(enemyQueue) > 0 and player.hp > 0:
         menu:
             "무엇을 하시겠습니까?"
-            "공격: 공격력의 [int(player.skillCoef*100)]%% 만큼 대미지를 입힙니다.":
+            "공격: 공격력의 {color=#7c4dff}[int(player.skillCoef*100)]%%{/color} 만큼 대미지를 입힙니다.":
                 $ attackByPlayer()
-                if damage == 0:
+                if totalDamage == 0:
                     "적이 공격을 회피했습니다!"
                 else:
-                    "적에게 [totalDamage]의 대미지를 입혔습니다!"
-            "회복: 최대체력의 [int(player.healCoef*100)]%% 만큼 체력을 회복합니다.":
+                    "적에게 {color=#7c4dff}[totalDamage]{/color}의 대미지를 입혔습니다!"
+            "회복: 최대체력의 {color=#7c4dff}[int(player.healCoef*100)]%%{/color} 만큼 체력을 회복합니다.":
                 $ healPlayer()
-                "체력을 [int(player.maxHp*player.healCoef)]만큼 회복했습니다!"
+                "체력을 {color=#7c4dff}[int(player.maxHp*player.healCoef)]{/color}만큼 회복했습니다!"
         
         if enemy.hp > 0:
             $ attackByEnemy()
             if damage == 0:
                 "적의 공격을 회피했습니다!"
             else:
-                "적에게서 [damage]의 대미지를 입었습니다!"
+                "적에게서 {color=#7c4dff}[damage]{/color}의 대미지를 입었습니다!"
         else:
-            "적 [enemy.name]을(를) 처치했습니다!"
+            "적 {color=#7c4dff}[enemy.name]{/color}(을)를 처치했습니다!"
             $ enemyQueue.pop(0)
             if len(enemyQueue) > 0:
                 $ enemy = enemyQueue[0]
-                "새로운 적 [enemy.name]이(가) 등장했습니다!"
+                $ enemy.hp = enemy.maxHp
+                "새로운 적 {color=#7c4dff}[enemy.name]{/color}(이)가 등장했습니다!"
     
-    "전투가 종료되었습니다."
     hide screen battle_stat
     hide screen player_stat
-    show screen stat
-    $ dice = random.randint(0, 1)
-    if areanum == 8:
-        jump boss
-    elif dice == 0:
-        jump select2
+
+    if player.hp <= 0:
+        scene black with fade
+        a "당신은 전투에서 패배했습니다..."
+        a "시뮬레이션에서 나갑니다."
+        stop music fadeout 1.0
+        jump report
     else:
-        jump select3
+        a "전투가 종료되었습니다."
+    
+    show screen stat
+    jump roadSign_bgmChange
 # 이곳은 전투 구역의 끝입니다.
 
 label EliteBattle:
@@ -590,13 +642,7 @@ label EliteBattle:
     scene bg2 with dissolve
     a "정예 구역에 진입했습니다."
 
-    $ dice = random.randint(0, 1)
-    if areanum == 8:
-        jump boss
-    elif dice == 0:
-        jump select2
-    else:
-        jump select3
+    jump roadSign_bgmChange
 # 이곳은 정예 구역의 끝입니다.
 
 label BossBattle:
@@ -611,6 +657,9 @@ label BossBattle:
     if (floor == 3 and (dice == 4 or mode == "tutorial")):
         jump pioneer
     elif floor == 4:
+        if mode == "tutorial":
+            a "축하합니다! 튜토리얼 모드를 클리어하셨습니다."
+            $ tutorialCleared = True
         jump report
     else:
         jump select3
@@ -681,7 +730,7 @@ label bank:
                 "은행 직원은 나에게 아무것도 주지 않았다."
 
     stop music fadeout 1.0
-    jump backto
+    jump backToSelect
 # 사건 1: 이세계 은행
 
 label roulette:
@@ -712,7 +761,7 @@ label roulette:
             "그 순간, 꿈이 일그러지며 뒤틀리고, 꿈에서 쫓겨나게 된다."
             "다행히 나에게는 아무 이상도 없다."
 
-    jump backto
+    jump backToSelect
 # 사건 2: 룰렛
 
 label perwin:
@@ -746,7 +795,7 @@ label perwin:
     na "..."
     show tester wut
     extend "이런 미친"
-    jump backto
+    jump backToSelect
 # 사건 3: 다스니 박사의 실수
 
 label template_dream:
@@ -763,7 +812,7 @@ label template_dream:
         "Choice 2":
             "선택지2"
 
-    jump backto
+    jump backToSelect
 # 사건 0: 템플릿
 
 label merudistan:
@@ -804,7 +853,7 @@ label merudistan:
     m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}{font=DungGeunMo.ttf}{size=60}방랑자여, 앞으로 나아가 길을 선택하거라.{/size}{/font}"
 
     stop music fadeout 1.0
-    jump backto
+    jump backToSelect
 # 사건 99: 메루디스탄 (1)
 
 label merudistan_2:
@@ -840,7 +889,7 @@ label merudistan_2:
     m3ru "Gerok, pêşde herin û riya xwe hilbijêrin.{p}{font=DungGeunMo.ttf}{size=60}방랑자여, 앞으로 나아가 길을 선택하거라.{/size}{/font}"
 
     stop music fadeout 1.0
-    jump backto
+    jump backToSelect
 # 사건 99: 메루디스탄 (2)
 
 label merudistan_3:
@@ -902,7 +951,7 @@ label merudistan_3:
     ezdan "{i}{font=Caveat-VariableFont_wght.ttf}{size=100}Gerok, pêşde herin û riya xwe hilbijêrin.{/size}{/font}{p}방랑자여, 앞으로 나아가 길을 선택하거라.{/i}"
 
     stop music fadeout 1.0
-    jump backto
+    jump backToSelect
 # 사건 99: 메루디스탄 (3)
 
 # 보상 구역 이벤트
@@ -921,7 +970,17 @@ label destination:
         jump store
 # 도착지 함수
 
-label RoadSign:
+label roadSign:
+    $ dice = random.randint(0, 1)
+    if areanum == 8:
+        jump boss
+    elif dice == 0:
+        jump select2
+    else:
+        jump select3
+# 선택지 함수
+
+label roadSign_bgmChange:
     play music "Unexplored Area.mp3"
     $ dice = random.randint(0, 1)
     if areanum == 8:
@@ -930,9 +989,9 @@ label RoadSign:
         jump select2
     else:
         jump select3
-# 선택지 수량 함수 
+# 선택지 함수
 
-label backto:
+label backToSelect:
     if howManyWay == 1:
         jump SelectDream1
     elif howManyWay == 2:
