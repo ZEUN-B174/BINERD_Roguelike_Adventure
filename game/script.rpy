@@ -16,9 +16,8 @@ init python:
 
     @dataclass
     class Player(Entity):
+        healCoef: float
         attackFrequency: int
-        ether: int
-        etherium: int
 
     @dataclass
     class Enemy(Entity):
@@ -33,15 +32,25 @@ init python:
         defence = 5,
         agi = 10,
         skillCoef = 1.0,
+        healCoef = 0.1,
         attackFrequency = 1,
-        ether = 200,
-        etherium = 0
     )
 
-    # 적 리스트
-    enemyList = []
-    
+    # 적 관련 변수
+    enemy: Enemy = None
+    enemyList = [
+        Enemy(name="슬라임", maxHp=30, hp=30, atk=5, defence=2, agi=5, skillCoef=1.0),
+        Enemy(name="고블린", maxHp=50, hp=50, atk=8, defence=4, agi=7, skillCoef=1.0),
+        Enemy(name="오크", maxHp=80, hp=80, atk=12, defence=6, agi=4, skillCoef=1.0),
+        Enemy(name="트롤", maxHp=120, hp=120, atk=15, defence=8, agi=3, skillCoef=1.0),
+        Enemy(name="드래곤", maxHp=300, hp=300, atk=25, defence=15, agi=10, skillCoef=1.2)
+    ]
+    enemyQueue = []
+
     # 시스템
+    ether = 200
+    etherium = 0
+
     area1 = "1" # 구역 1 목적지
     area2 = "2" # 구역 2 목적지
     area3 = "3" # 구역 3 목적지
@@ -56,7 +65,6 @@ init python:
     noMeru = ["이세계 은행", "룰렛 TV쇼", "???"]
 
     todream = "none" # 사건 선택지 저장 변수
-    damage = "" # 대미지 표시를 깔끔하게 하기 위한 변수
 
     #선택지 중복 방지용
     dreamed1 = False
@@ -72,6 +80,8 @@ init python:
     # 기타 코드
     meru_process = 1 # 메루디스탄 사건 진척도.
 
+    damage = 0
+    totalDamage = 0 # 총 대미지 계산용
     ###### 함수
 
     # 대미지 계산식
@@ -81,6 +91,29 @@ init python:
             return 0  # 회피 성공 시 대미지 0
         dmg = stat * attacker.skillCoef * (100 / (100 + defender.defence))
         return int(dmg)
+
+    def attackByPlayer():
+        global damage, totalDamage
+        totalDamage = 0
+
+        for i in range(player.attackFrequency):
+            damage = getDamage(player, enemy, player.atk)
+            enemy.hp -= damage
+            totalDamage += damage
+            if enemy.hp < 0:
+                enemy.hp = 0
+
+    def attackByEnemy():
+        global damage
+        damage = getDamage(enemy, player, enemy.atk)
+        player.hp -= damage
+        if player.hp < 0:
+            player.hp = 0
+
+    def healPlayer():
+        player.hp += int(player.maxHp * player.healCoef)
+        if player.hp > player.maxHp:
+            player.hp = player.maxHp
 
 # 렌파이 코드
 init:
@@ -92,15 +125,66 @@ init:
             ypadding 50
             xpos 150
             ypos 150
-            grid 1 8 spacing 10:
+            grid 2 7 spacing 10:
                 text '체력'
                 bar value StaticValue(player.hp, player.maxHp) xalign 0.5 xsize 600
-                text '공격력: [player.atk]'
-                text '방어력: [player.defence]'
-                text '민첩도: [player.agi]'
-                text '에테르: [player.ether]'
+
+                text '공격력'
+                text '[player.atk]'
+
+                text '방어력'
+                text '[player.defence]'
+
+                text '민첩도'
+                text '[player.agi]'
+
+                text '에테르'
+                text '[ether]'
+
                 text "[floor]차원"
                 text "[areanum]구역"
+
+    screen battle_stat():
+        frame:
+            xanchor 1.0
+            yanchor 0
+            xpadding 50
+            ypadding 50
+            xpos 3690
+            ypos 150
+            grid 2 4 spacing 10:
+                text '[enemy.name]'
+                text ''
+
+                text '적 체력'
+                bar value StaticValue(enemy.hp, enemy.maxHp) xalign 0.5 xsize 600
+
+                text '적 공격력'
+                text '[enemy.atk]'
+                
+                text '적 방어력'
+                text '[enemy.defence]'
+
+    screen player_stat():
+        frame:
+            xanchor 0
+            yanchor 1.0
+            xpadding 50
+            ypadding 50
+            xpos 150
+            ypos 2010
+            grid 2 4 spacing 10:
+                text '[name]'
+                text ''
+
+                text '플레이어 체력'
+                bar value StaticValue(player.hp, player.maxHp) xalign 0.5 xsize 600
+
+                text '플레이어 공격력'
+                text '[player.atk]'
+
+                text '플레이어 방어력'
+                text '[player.defence]'
 
 # image 문을 사용해 이미지를 정의합니다.
 
@@ -258,7 +342,7 @@ label StandBy:
         player.defence = 5
         player.agi = 10
         player.attackFrequency = 1
-        player.ether = 200
+        ether = 200
 
         if meru_process == "done":
             meru_process = 1
@@ -289,9 +373,9 @@ label MainGame:
 # 이곳은 로딩화면의 끝입니다.
 
 label report:
-    $ solid_ether = player.ether // 10
-    "[player.ether]에테르 >> [solid_ether]에테리움"
-    $ player.etherium += solid_ether
+    $ solid_ether = ether // 10
+    "[ether]에테르 >> [solid_ether]에테리움"
+    $ etherium += solid_ether
     "보고서 닫기"
     jump StandBy
 
@@ -339,20 +423,6 @@ label select3:
             $ togo = area3
             jump destination
 # 이곳은 구역 3선택의 끝입니다.
-
-label battle:
-    $ areanum += 1
-    scene bg2 with dissolve
-    a "전투 구역에 진입했습니다."
-
-    $ dice = random.randint(0, 1)
-    if areanum == 8:
-        jump boss
-    elif dice == 0:
-        jump select2
-    else:
-        jump select3
-# 이곳은 전투 구역의 끝입니다.
 
 label happening:
     $ areanum += 1
@@ -433,6 +503,20 @@ label SelectDream3:
             jump RoadSign
 # 이곳은 사건 구역의 끝입니다.
 
+label store:
+    $ areanum += 1
+    scene bg2 with dissolve
+    a "상점 구역에 진입했습니다."
+
+    $ dice = random.randint(0, 1)
+    if areanum == 8:
+        jump boss
+    elif dice == 0:
+        jump select2
+    else:
+        jump select3
+# 이곳은 상점 구역의 끝입니다.
+
 label reward:
     $ areanum += 1
     scene bg2 with dissolve
@@ -447,6 +531,60 @@ label reward:
         jump select3
 # 이곳은 보상 구역의 끝입니다.
 
+label battle:
+    $ areanum += 1
+    scene bg2 with dissolve
+    hide screen stat
+    a "전투 구역에 진입했습니다."
+
+    python:
+        enemyQueue.clear()
+        enemyNum = random.randint(1, 3)
+        for i in range(enemyNum):
+            enemyQueue.append(random.choice(enemyList))
+        enemy = enemyQueue[0]
+
+    show screen battle_stat()
+    show screen player_stat()
+    while len(enemyQueue) > 0 and player.hp > 0:
+        menu:
+            "무엇을 하시겠습니까?"
+            "공격: 공격력의 [int(player.skillCoef*100)]%% 만큼 대미지를 입힙니다.":
+                $ attackByPlayer()
+                if damage == 0:
+                    "적이 공격을 회피했습니다!"
+                else:
+                    "적에게 [totalDamage]의 대미지를 입혔습니다!"
+            "회복: 최대체력의 [int(player.healCoef*100)]%% 만큼 체력을 회복합니다.":
+                $ healPlayer()
+                "체력을 [int(player.maxHp*player.healCoef)]만큼 회복했습니다!"
+        
+        if enemy.hp > 0:
+            $ attackByEnemy()
+            if damage == 0:
+                "적의 공격을 회피했습니다!"
+            else:
+                "적에게서 [damage]의 대미지를 입었습니다!"
+        else:
+            "적 [enemy.name]을(를) 처치했습니다!"
+            $ enemyQueue.pop(0)
+            if len(enemyQueue) > 0:
+                $ enemy = enemyQueue[0]
+                "새로운 적 [enemy.name]이(가) 등장했습니다!"
+    
+    "전투가 종료되었습니다."
+    hide screen battle_stat
+    hide screen player_stat
+    show screen stat
+    $ dice = random.randint(0, 1)
+    if areanum == 8:
+        jump boss
+    elif dice == 0:
+        jump select2
+    else:
+        jump select3
+# 이곳은 전투 구역의 끝입니다.
+
 label EliteBattle:
     $ areanum += 1
     scene bg2 with dissolve
@@ -460,20 +598,6 @@ label EliteBattle:
     else:
         jump select3
 # 이곳은 정예 구역의 끝입니다.
-
-label store:
-    $ areanum += 1
-    scene bg2 with dissolve
-    a "상점 구역에 진입했습니다."
-
-    $ dice = random.randint(0, 1)
-    if areanum == 8:
-        jump boss
-    elif dice == 0:
-        jump select2
-    else:
-        jump select3
-# 이곳은 상점 구역의 끝입니다.
 
 label BossBattle:
     $ areanum += 1
@@ -496,8 +620,8 @@ label pioneer:
     scene black
     hide screen stat
     stop music
-    $ areanum = "-2147483647"
-    $ floor = "7KSR6rCE6rOE"
+    $ areanum = "?"
+    $ floor = "?"
     a "..."
     a "ERROR: 예기치 못한 목적지에 도달-습니---"
     a "..."
@@ -525,9 +649,6 @@ label pioneer:
 
 ##### 시스템
 
-# 전투 시스템
-label battleSystem:
-
 # 사건 구역 이벤트
 label bank:
     scene black with dissolve
@@ -545,16 +666,16 @@ label bank:
             if (dice <= 5):
                 "은행 직원" "Ji ber vê yekê we teserûfên xwe paşde xwest."
                 "은행 직원은 나에게 {color=#7c4dff}300에테르{/color}를 주었다."
-                $ player.ether += 300
+                $ ether += 300
             else:
                 "은행 직원" "Ma hûn dixwazin hin teserûfên xwe paşde bistînin?"
                 "은행 직원은 나에게 {color=#7c4dff}100에테르{/color}를 주었다."
-                $ player.ether += 100
+                $ ether += 100
         "주변에서 사람들이 하는 말을 대충 끼워맞춘다.":
             if (dice > 7):
                 "은행 직원" "Ji ber vê yekê we dixwest ku teserûfên xwe plus faîzê paşde bistînin."
                 "은행 직원은 나에게 {color=#7c4dff}500에테르{/color}를 주었다."
-                $ player.ether += 500
+                $ ether += 500
             else:
                 "은행 직원" "Ez nikarim fêm bikim ka hûn çi dibêjin."
                 "은행 직원은 나에게 아무것도 주지 않았다."
@@ -580,7 +701,7 @@ label roulette:
             "사회자" "결과는...!"
             $ dice = random.randint(1, 6)
             "사회자" "축하합니다! {color=#7c4dff}[dice*100]에테르{/color}(을)를 얻으셨군요!"
-            $ player.ether += dice * 100
+            $ ether += dice * 100
             stop music
             scene black
             "그 순간, 갑자기 바닥이 꺼지고 어두운 바닥으로 떨어지면서..."
@@ -616,8 +737,8 @@ label perwin:
     menu:
         "에테르 주세요":
             "당신은 {color=#7c4dff}321에테르{/color}를 받았다."
-            $ player.ether += 321
-            
+            $ ether += 321
+
     p "그럼 이제 가볼게!!"
     hide perwin with easeoutleft
     show tester at center with ease
@@ -675,7 +796,7 @@ label merudistan:
             $ player.defence += 1000
             $ player.agi += 100
         "[[정제된 농축 에테르]: 2000에테르를 획득한다.":
-            $ player.ether += 2000
+            $ ether += 2000
     
     show meru confident
     m "그럼 나중에 인연이 되면 또 보자."

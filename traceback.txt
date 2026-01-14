@@ -1,26 +1,24 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 260, in script
-    python:
-  File "game/script.rpy", line 266, in <module>
-    for ait in itemlist:
-NameError: name 'itemlist' is not defined
+  File "game/script.rpy", line 551, in script
+    menu:
+ValueError: unsupported format character '?' (0xb9cc) at index 38
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 260, in script
-    python:
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 834, in execute
-    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\python.py", line 1187, in py_exec_bytecode
-    exec(bytecode, globals, locals)
-  File "game/script.rpy", line 266, in <module>
-    for ait in itemlist:
-NameError: name 'itemlist' is not defined
+  File "game/script.rpy", line 551, in script
+    menu:
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 1632, in execute
+    choice = renpy.exports.menu(choices, self.set, args, kwargs, item_arguments)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\exports\menuexports.py", line 99, in menu
+    label = substitute(label)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\exports\menuexports.py", line 62, in substitute
+    return s % renpy.exports.tag_quoting_dict
+ValueError: unsupported format character '?' (0xb9cc) at index 38
 
 Windows-10-10.0.26200 AMD64
 Ren'Py 8.3.7.25031702
-비네르드: 로그라이크 어드벤처 0.1
-Sun Jan 11 00:15:21 2026
+비네르드: 로그라이크 어드벤처 0.2.1 Alpha
+Wed Jan 14 16:09:10 2026

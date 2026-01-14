@@ -2,9 +2,13 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 584: expected statement.
-    else:
-        ^
+File "game/script.rpy", line 553: end of line expected.
+    hide screen battle_stat()
+                           ^
+
+File "game/script.rpy", line 554: end of line expected.
+    hide screen player_stat()
+                           ^
 
 Ren'Py Version: Ren'Py 8.3.7.25031702
-Sat Jan 10 20:59:46 2026
+Wed Jan 14 15:53:11 2026
