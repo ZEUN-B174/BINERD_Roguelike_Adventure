@@ -2,9 +2,11 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 56: expected an indented block
-    ether = 200
-     ^
+The label reward is defined twice, at File "game/script.rpy", line 662:
+label reward:
+and File "game/script.rpy", line 1152:
+label reward():
+
 
 Ren'Py Version: Ren'Py 8.3.7.25031702
-Thu Jan 15 01:31:55 2026
+Thu Jan 15 17:37:12 2026

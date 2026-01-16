@@ -1,24 +1,85 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 551, in script
-    menu:
-ValueError: unsupported format character '?' (0xb9cc) at index 38
+  File "game/script.rpy", line 541, in script
+    a "시뮬레이션으로 제대로 들어오셨군요."
+  File "renpy/common/000window.rpy", line 132, in _window_auto_callback
+    _window_show(auto=True)
+  File "renpy/common/000window.rpy", line 75, in _window_show
+    renpy.with_statement(trans)
+  File "game/script.rpy", line 258, in execute
+    screen stat_details():
+  File "game/script.rpy", line 258, in execute
+    screen stat_details():
+  File "game/script.rpy", line 259, in execute
+    frame:
+SyntaxError: unexpected EOF while parsing (<none>, line 1)
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 551, in script
-    menu:
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 1632, in execute
-    choice = renpy.exports.menu(choices, self.set, args, kwargs, item_arguments)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\exports\menuexports.py", line 99, in menu
-    label = substitute(label)
-  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\exports\menuexports.py", line 62, in substitute
-    return s % renpy.exports.tag_quoting_dict
-ValueError: unsupported format character '?' (0xb9cc) at index 38
+  File "game/script.rpy", line 541, in script
+    a "시뮬레이션으로 제대로 들어오셨군요."
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 2586, in execute
+    Say.execute(self)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 591, in execute
+    statement_name(stmt_name)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\ast.py", line 58, in statement_name
+    i(name)
+  File "renpy/common/000window.rpy", line 132, in _window_auto_callback
+    _window_show(auto=True)
+  File "renpy/common/000window.rpy", line 75, in _window_show
+    renpy.with_statement(trans)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\exports\statementexports.py", line 257, in with_statement
+    return renpy.game.interface.do_with(trans, paired, clear=clear)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\core.py", line 1581, in do_with
+    return self.interact(trans_pause=True,
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\core.py", line 2218, in interact
+    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\core.py", line 2748, in interact_core
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  [Previous line repeated 1 more time]
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\screen.py", line 480, in visit_all
+    callback(self)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\core.py", line 2748, in <lambda>
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\screen.py", line 491, in per_interact
+    self.update()
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\display\screen.py", line 700, in update
+    self.screen.function(**self.scope)
+  File "game/script.rpy", line 258, in execute
+    screen stat_details():
+  File "game/script.rpy", line 258, in execute
+    screen stat_details():
+  File "game/script.rpy", line 259, in execute
+    frame:
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\text\text.py", line 2177, in _scope
+    return self.set_text(self.text_parameter, scope, self.substitute, update)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\text\text.py", line 2216, in set_text
+    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\substitutions.py", line 373, in substitute
+    s = interpolate(s, variables) # type: ignore
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\substitutions.py", line 86, in interpolate
+    raise e
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\substitutions.py", line 78, in interpolate
+    value = renpy.python.py_eval(code, {}, scope)
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\python.py", line 1216, in py_eval
+    code = py_compile(code, 'eval')
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\python.py", line 1153, in py_compile
+    raise e
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\python.py", line 1090, in py_compile
+    raise orig_e
+  File "C:\Users\daamu\Downloads\renpy-8.3.7-sdk\renpy\python.py", line 1082, in py_compile
+    tree = compile(source, filename, py_mode, ast.PyCF_ONLY_AST | flags, 1)
+SyntaxError: unexpected EOF while parsing (<none>, line 1)
 
 Windows-10-10.0.26200 AMD64
 Ren'Py 8.3.7.25031702
 비네르드: 로그라이크 어드벤처 0.2.1 Alpha
-Wed Jan 14 16:09:10 2026
+Fri Jan 16 16:18:03 2026

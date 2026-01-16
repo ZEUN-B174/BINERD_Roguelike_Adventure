@@ -30,7 +30,7 @@ init python:
         maxHp = 100,
         hp = 100,
         atk = 10,
-        defence = 5,
+        defence = 10,
         agi = 10,
         skillCoef = 1.0,
         healCoef = 0.1,
@@ -40,46 +40,133 @@ init python:
 
     # 적 관련 변수
     enemy: Enemy = None
-    enemyList = [
-        Enemy(name="슬라임", maxHp=30, hp=30, atk=5, defence=2, agi=5, skillCoef=1.0),
-        Enemy(name="고블린", maxHp=50, hp=50, atk=8, defence=4, agi=7, skillCoef=1.0),
-        Enemy(name="오크", maxHp=80, hp=80, atk=12, defence=6, agi=4, skillCoef=1.0),
-        Enemy(name="트롤", maxHp=120, hp=120, atk=15, defence=8, agi=3, skillCoef=1.0),
-        Enemy(name="드래곤", maxHp=300, hp=300, atk=25, defence=15, agi=10, skillCoef=1.2)
-    ]
     enemyQueue = []
+    enemyNum = 0
     enemyDodgeChance = 0.2
+
+    commonEnemyList = [
+        Enemy(name="슬라임", maxHp=15, hp=15, atk=5, defence=2, agi=5, skillCoef=1.0),
+        Enemy(name="고블린", maxHp=25, hp=25, atk=6, defence=4, agi=7, skillCoef=1.0),
+        Enemy(name="스켈레톤", maxHp=20, hp=20, atk=7, defence=3, agi=6, skillCoef=1.0),
+        Enemy(name="좀비", maxHp=30, hp=30, atk=9, defence=3, agi=2, skillCoef=1.0),
+        Enemy(name="늑대인간", maxHp=35, hp=35, atk=8, defence=6, agi=5, skillCoef=1.0)
+    ]
+    eliteEnemyList = [
+        Enemy(name="오우거", maxHp=75, hp=75, atk=20, defence=10, agi=5, skillCoef=1.0),
+        Enemy(name="리치", maxHp=65, hp=65, atk=18, defence=8, agi=6, skillCoef=1.0),
+        Enemy(name="트롤", maxHp=80, hp=80, atk=22, defence=12, agi=4, skillCoef=1.0)
+    ]
+    bossList = [
+        Enemy(name="드래곤", maxHp=300, hp=300, atk=30, defence=15, agi=10, skillCoef=1.0),
+        Enemy(name="데몬로드", maxHp=280, hp=280, atk=28, defence=14, agi=12, skillCoef=1.0)
+    ]
 
     # 버프 관련 클래스
     @dataclass
     class Buff:
         name: str
         description: str
-        def apply(self, amount: int):
+        amount: int
+
+        def apply(self):
             pass
     
+    # 덧셈형 버프
     @dataclass
     class HpBuff(Buff):
-        def apply(self, amount: int):
-            player.maxHp += amount
-            player.hp += amount
+        def apply(self):
+            player.maxHp += self.amount
+            player.hp += self.amount
 
     @dataclass
     class AtkBuff(Buff):
-        def apply(self, amount: int):
-            player.atk += amount
+        def apply(self):
+            player.atk += self.amount
 
     @dataclass
     class DefBuff(Buff):
-        def apply(self, amount: int):
-            player.defence += amount
+        def apply(self):
+            player.defence += self.amount
 
     @dataclass
     class AgiBuff(Buff):
-        def apply(self, amount: int):
-            player.agi += amount
-
+        def apply(self):
+            player.agi += self.amount
     
+    @dataclass
+    class SkillCoefBuff(Buff):
+        def apply(self):
+            player.skillCoef += self.amount / 100.0
+
+    @dataclass
+    class HealCoefBuff(Buff):
+        def apply(self):
+            player.healCoef += self.amount / 100.0
+
+    @dataclass
+    class DodgeChanceBuff(Buff):
+        def apply(self):
+            player.dodgeChance += self.amount / 100.0
+
+    @dataclass
+    class AttackFrequencyBuff(Buff):
+        def apply(self):
+            player.attackFrequency += self.amount
+
+    # 곱셈형 버프
+    @dataclass
+    class HpMultBuff(Buff):
+        def apply(self):
+            player.maxHp = int(player.maxHp * (1 + self.amount / 100.0))
+            player.hp = player.maxHp
+
+    @dataclass
+    class AtkMultBuff(Buff):
+        def apply(self):
+            player.atk = int(player.atk * (1 + self.amount / 100.0))
+
+    @dataclass
+    class DefMultBuff(Buff):
+        def apply(self):
+            player.defence = int(player.defence * (1 + self.amount / 100.0))
+
+    @dataclass
+    class AgiMultBuff(Buff):
+        def apply(self):
+            player.agi = int(player.agi * (1 + self.amount / 100.0))
+    
+    # 버프 리스트
+    commonBuffList = [
+        HpBuff(name="체력 소폭 증가", description="최대 체력을 {color=#7c4dff}20{/color} 증가시킵니다.", amount=20),
+        AtkBuff(name="공격력 소폭 증가", description="공격력을 {color=#7c4dff}10{/color} 증가시킵니다.", amount=10),
+        DefBuff(name="방어력 소폭 증가", description="방어력을 {color=#7c4dff}5{/color} 증가시킵니다.", amount=5),
+        AgiBuff(name="민첩도 소폭 증가", description="민첩도를 {color=#7c4dff}5{/color} 증가시킵니다.", amount=5),
+        SkillCoefBuff(name="스킬 계수 소폭 증가", description="스킬 계수를 {color=#7c4dff}10%{/color} 증가시킵니다.", amount=10),
+        HealCoefBuff(name="회복 계수 소폭 증가", description="회복 계수를 {color=#7c4dff}1%{/color} 증가시킵니다.", amount=1),
+        DodgeChanceBuff(name="회피 확률 소폭 증가", description="회피 확률을 {color=#7c4dff}5%{/color} 증가시킵니다.", amount=5),
+        AttackFrequencyBuff(name="공격 빈도 소폭 증가", description="공격 빈도를 {color=#7c4dff}1회{/color} 증가시킵니다.", amount=1)
+    ]
+    rareBuffList = [
+        HpMultBuff(name="체력 중폭 증가", description="최대 체력을 {color=#7c4dff}50%{/color} 증가시킵니다.", amount=50),
+        AtkMultBuff(name="공격력 중폭 증가", description="공격력을 {color=#7c4dff}30%{/color} 증가시킵니다.", amount=30),
+        DefMultBuff(name="방어력 중폭 증가", description="방어력을 {color=#7c4dff}30%{/color} 증가시킵니다.", amount=30),
+        AgiMultBuff(name="민첩도 중폭 증가", description="민첩도를 {color=#7c4dff}30%{/color} 증가시킵니다.", amount=30),
+        SkillCoefBuff(name="스킬 계수 중폭 증가", description="스킬 계수를 {color=#7c4dff}25%{/color} 증가시킵니다.", amount=25),
+        HealCoefBuff(name="회복 계수 중폭 증가", description="회복 계수를 {color=#7c4dff}3%{/color} 증가시킵니다.", amount=3),
+        DodgeChanceBuff(name="회피 확률 중폭 증가", description="회피 확률을 {color=#7c4dff}15%{/color} 증가시킵니다.", amount=15),
+        AttackFrequencyBuff(name="공격 빈도 중폭 증가", description="공격 빈도를 {color=#7c4dff}2회{/color} 증가시킵니다.", amount=2)
+    ]
+    legendaryBuffList = [
+        HpMultBuff(name="체력 대폭 증가", description="최대 체력을 {color=#7c4dff}100%{/color} 증가시킵니다.", amount=100),
+        AtkMultBuff(name="공격력 대폭 증가", description="공격력을 {color=#7c4dff}50%{/color} 증가시킵니다.", amount=50),
+        DefMultBuff(name="방어력 대폭 증가", description="방어력을 {color=#7c4dff}50%{/color} 증가시킵니다.", amount=50),
+        AgiMultBuff(name="민첩도 대폭 증가", description="민첩도를 {color=#7c4dff}50%{/color} 증가시킵니다.", amount=50),
+        SkillCoefBuff(name="스킬 계수 대폭 증가", description="스킬 계수를 {color=#7c4dff}30%{/color} 증가시킵니다.", amount=30),
+        HealCoefBuff(name="회복 계수 대폭 증가", description="회복 계수를 {color=#7c4dff}5%{/color} 증가시킵니다.", amount=5),
+        DodgeChanceBuff(name="회피 확률 대폭 증가", description="회피 확률을 {color=#7c4dff}25%{/color} 증가시킵니다.", amount=25),
+        AttackFrequencyBuff(name="공격 빈도 대폭 증가", description="공격 빈도를 {color=#7c4dff}3회{/color} 증가시킵니다.", amount=3)
+    ]
+
     # 시스템
     ether = 200
     etherium = 0
@@ -91,10 +178,6 @@ init python:
     area3 = "3" # 구역 3 목적지
     areaList = ["전투", "사건", "보상", "정예", "상점"]
     togo = "none" # 목적지 저장 변수
-
-    dream1 = "a" # 사건 1 목적지
-    dream2 = "b" # 사건 2 목적지
-    dream3 = "c" # 사건 3 목적지
 
     dreamList = ["이세계 은행", "메루디스탄", "룰렛 TV쇼", "???"]
     noMeru = ["이세계 은행", "룰렛 TV쇼", "???"]
@@ -114,9 +197,8 @@ init python:
 
     # 기타 코드
     meru_process = 1 # 메루디스탄 사건 진척도.
-
-    damage = 0
     totalDamage = 0 # 총 대미지 계산용
+    
     ###### 함수
 
     # 대미지 계산식
@@ -125,35 +207,36 @@ init python:
             dodge_success_rate = defender.agi / (attacker.agi + defender.agi)
             if random.random() < dodge_success_rate:
                 return 0  # 회피 성공 시 대미지 0
-        dmg = stat * attacker.skillCoef * (100 / (100 + defender.defence))
+        dmg = stat * attacker.skillCoef * (50 / (50 + defender.defence))
         return max(int(dmg), 1)  # 최소 대미지 1 보장
 
-    def attackByPlayer():
-        global damage, totalDamage
+    def attackByPlayer() -> list:
+        global totalDamage
         totalDamage = 0
+        damageQueue = []
 
         for i in range(player.attackFrequency):
             damage = getDamage(player, enemy, player.atk, player.dodgeChance)
-            enemy.hp -= damage
+            damageQueue.append(damage)
             totalDamage += damage
             if enemy.hp < 0:
                 enemy.hp = 0
+        return damageQueue
 
-    def attackByEnemy():
-        global damage
+    def attackByEnemy() -> int:
         damage = getDamage(enemy, player, enemy.atk, enemyDodgeChance)
-        player.hp -= damage
         if player.hp < 0:
             player.hp = 0
+        return damage
 
     def healPlayer():
         player.hp += int(player.maxHp * player.healCoef)
         if player.hp > player.maxHp:
             player.hp = player.maxHp
 
-# 렌파이 코드
+# 렌파이 GUI 스크린
 init:
-    screen stat():
+    screen simple_stat():
         frame:
             xanchor 0
             yanchor 0
@@ -163,31 +246,32 @@ init:
             ypos 150
             vbox:
                 spacing 10
-
                 hbox:
-                    vbox:
-                        spacing 10
-                        text '공격력: '
-                        text '방어력: '
-                        text '민첩도: '
-                        text '에테르: '
-                        text '체력'
-
-                    vbox:
-                        spacing 10
-
-                        text '[player.atk]'
-                        text '[player.defence]'
-                        text '[player.agi]'
-                        text '[ether]'
-                        hbox:
-                            bar value StaticValue(player.hp, player.maxHp) xalign 0.5 xsize 600
-                            null width 10
-                            text '[player.hp]/[player.maxHp]'
-                
+                    text _('체력 ')
+                    bar value AnimatedValue(player.hp, player.maxHp, 0.1) xalign 0.5 xsize 600
+                    null width 10
+                    text '[player.hp]/[player.maxHp]'
+                text _('에테르: {color=#7c4dff}[ether]{/color}')
                 text ''
-                text "[floor]차원 [areanum]구역"
-
+                text _("[floor]차원 [areanum]구역")
+    
+    screen stat_details():
+        frame:
+            xanchor 0
+            yanchor 0
+            xpadding 50
+            ypadding 50
+            xpos 150
+            ypos 594
+            vbox:
+                spacing 10
+                text _('공격력: {color=#7c4dff}[player.atk]{/color}')
+                text _('방어력: {color=#7c4dff}[player.defence]{/color}')
+                text _('민첩도: {color=#7c4dff}[player.agi]{/color}')
+                text _('스킬 계수: {color=#7c4dff}[int(player.skillCoef*100)]%{/color}')
+                text _('회복 계수: {color=#7c4dff}[int(player.healCoef*100)]%{/color}')
+                text _('회피 확률: {color=#7c4dff}[int(player.dodgeChance*100)]%{/color}')
+                text _('공격 빈도: {color=#7c4dff}[player.attackFrequency]{/color}회')
 
     screen battle_stat():
         frame:
@@ -200,17 +284,17 @@ init:
             vbox:
                 spacing 10
 
-                text '[enemy.name]'
+                text '{color=#7c4dff}[enemy.name]{/color}'
                 null height 10
 
                 hbox:
                     spacing 10
-                    text '체력 '
-                    bar value StaticValue(enemy.hp, enemy.maxHp) xalign 0.5 xsize 600
+                    text _('체력 ')
+                    bar value AnimatedValue(enemy.hp, enemy.maxHp, 0.1) xalign 0.5 xsize 600
                     null width 5
                     text '[enemy.hp]/[enemy.maxHp]'
 
-                text '공격력: [enemy.atk] | 방어력: [enemy.defence]'
+                text _('ATK {color=#7c4dff}[enemy.atk]{/color} | DEF {color=#7c4dff}[enemy.defence]{/color} | AGI {color=#7c4dff}[enemy.agi]{/color}')
 
     screen player_stat():
         frame:
@@ -223,17 +307,28 @@ init:
             vbox:
                 spacing 10
 
-                text '[name]'
+                text '{color=#7c4dff}[name]{/color}'
                 null height 10
 
                 hbox:
                     spacing 10
-                    text '체력 '
-                    bar value StaticValue(player.hp, player.maxHp) xalign 0.5 xsize 600
+                    text _('체력 ')
+                    bar value AnimatedValue(player.hp, player.maxHp, 0.1) xalign 0.5 xsize 600
                     null width 5
                     text '[player.hp]/[player.maxHp]'
 
-                text '공격력: [player.atk] | 방어력: [player.defence]'
+                text _('ATK {color=#7c4dff}[player.atk]{/color} | DEF {color=#7c4dff}[player.defence]{/color} | AGI {color=#7c4dff}[player.agi]{/color}')
+
+    screen battle_phase():
+        frame:
+            xanchor 0.5
+            yanchor 0
+            xpadding 50
+            ypadding 50
+            xpos 0.5
+            ypos 150
+            vbox:
+                text _('페이즈 [enemyNum - len(enemyQueue) + 1]/[enemyNum]')
 
 # image 문을 사용해 이미지를 정의합니다.
 
@@ -259,20 +354,39 @@ image tester injang = "Tester_-w-.png"
 image tester wut = "Tester_wut.png"
 image tester curious = "Tester_curious.png"
 
+image tester standby = "Tester_standby.png"
+image tester attack = "Tester_attack.png"
+image tester attack_combo = "Tester_attack_combo.png"
+image tester hit = "Tester_hit.png"
+image tester heal = "Tester_heal.png"
+
 # 메루 이미지
 image meru normal = "Meru_default.png"
 image meru confident = "Meru_UU.png"
 image meru injang = "Meru_-w-.png"
 image meru merong = "Meru_merong.png"
 
+# 이미지 변형
+transform hit:
+    linear 0.05 xoffset -50
+    linear 0.05 xoffset 50
+    linear 0.05 xoffset -25
+    linear 0.05 xoffset 25
+    linear 0.05 xoffset 0
+
+transform dodge:
+    easein 0.2 xoffset -700
+    pause 0.2
+    easein 0.2 xoffset 0
+
 # 게임에서 사용할 캐릭터를 정의합니다.
-define p = Character('페르윈 다스니', color="#fcb714")
+define p = Character(_('페르윈 다스니'), color="#fcb714")
 define a = Character('Mîxayîl', color="#514ed7")
 define na = Character("[name]", color="#565274")
 
-define m = Character('「메루」', color="#7c4dff")
+define m = Character(_('「메루」'), color="#7c4dff")
 define m3ru = Character(who_bold=True, what_italic=True, what_color="#7c4dff", what_font="Caveat-VariableFont_wght.ttf", what_size=100)
-define ezdan = Character('야즈단', what_italic=True, color="#7c4dff")
+define ezdan = Character(_('야즈단'), what_italic=True, color="#7c4dff")
 
 # 여기에서부터 게임이 시작합니다.
 label start:
@@ -361,10 +475,12 @@ label Tutorial:
     a "다스니 박사님의 시뮬레이션에 오신 걸 환영합니다."
     a "저는 박사님의 AI 조수, Mîxayîl(미하일)입니다."
     a "박사님이 마저 하지 못한 설명은 제가 해드릴테니 걱정하지 마세요."
-    show screen stat
+    show screen simple_stat
+    show screen stat_details
     a "이건 게임에 들어가면 보이는 당신의 능력치를 나타낸 상태창이랍니다."
     a "상단에는 체력과 공격력, 방어력, 에테르가 보이고, 하단에는 현재 층과 구역이 보입니다."
-    hide screen stat
+    hide screen simple_stat
+    hide screen stat_details
     a "이건 이쯤에서 넘어가고, 다음으로 박사님이 제대로 말하지 않은 구역에 대해서 설명해드릴게요."
     a "상점 구역: 에테르를 소비해 원하는 아이템이나 스킬를 구매할 수 있습니다."
     a "정예 구역: 전투 구역보다 더 강한 적을 마주치고, 보상도 전투 구역보다 더 많이 나옵니다."
@@ -380,14 +496,15 @@ label Tutorial:
 # 이곳은 튜토리얼의 끝입니다.
 
 label StandBy:
-    hide screen stat
+    hide screen simple_stat
+    hide screen stat_details
     python:
         areanum = 0
         floor = 1
         player.maxHp = 100
         player.hp = player.maxHp
         player.atk = 10
-        player.defence = 5
+        player.defence = 10
         player.agi = 10
         player.attackFrequency = 1
         player.skillCoef = 1.0
@@ -417,7 +534,8 @@ label StandBy:
 
 label MainGame:
     scene bg1 with dissolve
-    show screen stat
+    show screen simple_stat
+    show screen stat_details
     play music "Unexplored Area.mp3"
     if mode == "tutorial":
         a "시뮬레이션으로 제대로 들어오셨군요."
@@ -438,6 +556,7 @@ label boss:
     menu:
         "진입할 구역을 정해주세요."
         "보스전":
+            $ togo = "보스전"
             jump BossBattle
 # 이곳은 보스전 진입의 끝입니다.
 
@@ -572,68 +691,16 @@ label reward:
 
     jump roadSign
 # 이곳은 보상 구역의 끝입니다.
-
+  
 label battle:
     $ areanum += 1
     scene bg2 with dissolve
-    hide screen stat
     a "전투 구역에 진입했습니다."
 
-    python:
-        enemyQueue.clear()
-        enemyNum = random.randint(2, 4)
-        for i in range(enemyNum):
-            enemyQueue.append(random.choice(enemyList))
-        enemy = enemyQueue[0]
-        enemy.hp = enemy.maxHp
+    $ enemyNum = random.randint(2, 5)
+    call battleSystem(commonEnemyList)
+    call getReward()
 
-    $ dice = random.randint(1, 2)
-    if dice == 1:
-        play music "WKTKFGKRHTLVEK.wav" fadein 1.0
-    else:
-        play music "DUNGEON_WKTKF.wav" fadein 1.0
-    show screen battle_stat()
-    show screen player_stat()
-    while len(enemyQueue) > 0 and player.hp > 0:
-        menu:
-            "무엇을 하시겠습니까?"
-            "공격: 공격력의 {color=#7c4dff}[int(player.skillCoef*100)]%%{/color} 만큼 대미지를 입힙니다.":
-                $ attackByPlayer()
-                if totalDamage == 0:
-                    "적이 공격을 회피했습니다!"
-                else:
-                    "적에게 {color=#7c4dff}[totalDamage]{/color}의 대미지를 입혔습니다!"
-            "회복: 최대체력의 {color=#7c4dff}[int(player.healCoef*100)]%%{/color} 만큼 체력을 회복합니다.":
-                $ healPlayer()
-                "체력을 {color=#7c4dff}[int(player.maxHp*player.healCoef)]{/color}만큼 회복했습니다!"
-        
-        if enemy.hp > 0:
-            $ attackByEnemy()
-            if damage == 0:
-                "적의 공격을 회피했습니다!"
-            else:
-                "적에게서 {color=#7c4dff}[damage]{/color}의 대미지를 입었습니다!"
-        else:
-            "적 {color=#7c4dff}[enemy.name]{/color}(을)를 처치했습니다!"
-            $ enemyQueue.pop(0)
-            if len(enemyQueue) > 0:
-                $ enemy = enemyQueue[0]
-                $ enemy.hp = enemy.maxHp
-                "새로운 적 {color=#7c4dff}[enemy.name]{/color}(이)가 등장했습니다!"
-    
-    hide screen battle_stat
-    hide screen player_stat
-
-    if player.hp <= 0:
-        scene black with fade
-        a "당신은 전투에서 패배했습니다..."
-        a "시뮬레이션에서 나갑니다."
-        stop music fadeout 1.0
-        jump report
-    else:
-        a "전투가 종료되었습니다."
-    
-    show screen stat
     jump roadSign_bgmChange
 # 이곳은 전투 구역의 끝입니다.
 
@@ -641,6 +708,10 @@ label EliteBattle:
     $ areanum += 1
     scene bg2 with dissolve
     a "정예 구역에 진입했습니다."
+
+    $ enemyNum = random.randint(1, 3)
+    call battleSystem(eliteEnemyList)
+    call getReward()
 
     jump roadSign_bgmChange
 # 이곳은 정예 구역의 끝입니다.
@@ -650,6 +721,11 @@ label BossBattle:
     scene bg2 with dissolve
     a "보스 구역에 진입했습니다."
 
+    $ enemyNum = 1
+    call battleSystem(bossList)
+    call getReward()
+    
+    play music "Unexplored Area.mp3"
     python:
         areanum = 0
         floor += 1
@@ -667,7 +743,8 @@ label BossBattle:
 
 label pioneer:
     scene black
-    hide screen stat
+    hide screen simple_stat
+    hide screen stat_details
     stop music
     $ areanum = "?"
     $ floor = "?"
@@ -681,7 +758,9 @@ label pioneer:
     a "실행 완료."
     play music "Dream Dungeon.wav" fadein 1.0
     scene bg1 with dissolve
-    show screen stat
+    show screen simple_stat
+    show screen stat_details
+    with dissolve
     if mode == "tutorial":
         a "미개척 구역에 처음 오신 걸 환영합니다, [name]님."
         a "이곳은 다스니 박사님도 발견하지 못한 미지의 공간으로, {p=.7}제가 여기에 도착하면서 인간이 알아볼 수 있는 형태로 정리했습니다."
@@ -1023,6 +1102,153 @@ label sleep:
         "님 버그 발생했음 실수로 사건 가는걸 여기다 안넣었거나 잘못 타이핑한거임"
         jump perwin
 # 꿈 이동 함수
+
+# 전투 시스템
+label battleSystem(enemyList):
+    python:
+        enemyLevel = (floor - 1)*9 + areanum
+        enemyDodgeChance = 0.2 + (enemyLevel * 0.01)
+        enemyQueue.clear()
+
+        for i in range(enemyNum):
+            enemyChoice = random.choice(enemyList)
+
+            enemyInstance = Enemy(
+                name = enemyChoice.name,
+                maxHp = (enemyChoice.maxHp + enemyLevel*5)*floor,
+                hp = (enemyChoice.maxHp + enemyLevel*5)*floor,
+                atk = (enemyChoice.atk + enemyLevel*2)*floor,
+                defence = (enemyChoice.defence + enemyLevel*2)*floor,
+                agi = (enemyChoice.agi + enemyLevel*2)*floor,
+                skillCoef = enemyChoice.skillCoef
+            )
+            enemyQueue.append(enemyInstance)
+        enemy = enemyQueue[0]
+        enemy.hp = enemy.maxHp
+
+    $ dice = random.randint(1, 2)
+    if dice == 1:
+        play music "WKTKFGKRHTLVEK.wav" fadein 1.0
+    else:
+        play music "DUNGEON_WKTKF.wav" fadein 1.0
+
+    hide screen simple_stat
+    hide screen stat_details
+    show screen battle_stat()
+    show screen player_stat()
+    show screen battle_phase()
+    with dissolve
+    show tester standby at left with easeinleft
+
+    while len(enemyQueue) > 0 and player.hp > 0:
+        menu:
+            "무엇을 하시겠습니까?"
+            "공격: 공격력의 {color=#7c4dff}[int(player.skillCoef*100)]%%{/color} 만큼 {color=#7c4dff}[player.attackFrequency]{/color}회 대미지를 입힙니다.":
+                $ attackQueue = attackByPlayer()
+                $ attackCombo = 0
+                show tester:
+                    linear 0.1 xoffset 50
+                
+                while attackQueue:
+                    if attackCombo % 2 == 0:
+                        show tester attack
+                    else:
+                        show tester attack_combo
+                    python:
+                        enemy.hp -= attackQueue.pop(0)
+                        if enemy.hp < 0:
+                            enemy.hp = 0
+                    pause(0.2)
+                    $ attackCombo += 1
+                show tester standby:
+                    linear 0.1 xoffset 0
+                "적에게 {color=#7c4dff}[totalDamage]{/color}의 대미지를 입혔습니다!"
+            "회복: 최대체력의 {color=#7c4dff}[int(player.healCoef*100)]%%{/color} 만큼 체력을 회복합니다.":
+                $ healPlayer()
+                show tester heal
+                pause(0.2)
+                show tester standby
+                "체력을 {color=#7c4dff}[int(player.maxHp*player.healCoef)]{/color}만큼 회복했습니다!"
+        
+        if enemy.hp > 0:
+            $ damage = attackByEnemy()
+            $ player.hp -= damage
+            if damage == 0:
+                show tester at dodge
+                "적의 공격을 회피했습니다!"
+            else:
+                show tester hit at hit
+                pause(0.25)
+                show tester standby
+                "적에게서 {color=#7c4dff}[damage]{/color}의 대미지를 입었습니다!"
+        else:
+            "{color=#7c4dff}[enemy.name]{/color}(을)를 처치했습니다!"
+            $ enemyQueue.pop(0)
+            if len(enemyQueue) > 0:
+                $ enemy = enemyQueue[0]
+                $ enemy.hp = enemy.maxHp
+                "새로운 적 {color=#7c4dff}[enemy.name]{/color}(이)가 등장했습니다!"
+    
+    hide tester with easeoutleft
+    hide screen battle_stat
+    hide screen player_stat
+    hide screen battle_phase
+    show screen simple_stat
+    show screen stat_details
+    with dissolve
+
+    if player.hp <= 0:
+        scene black with fade
+        a "당신은 전투에서 패배했습니다..."
+        a "시뮬레이션에서 나갑니다."
+        stop music fadeout 1.0
+        jump report
+    else:
+        a "전투가 종료되었습니다."
+    return
+    
+label getReward():
+    python:
+        inst = 0
+        buffNum = 0
+        if togo == "전투":
+            commonBuffChance = 70
+            rareBuffChance = 95
+            buffNum = enemyNum
+        elif togo == "정예":
+            commonBuffChance = 55
+            rareBuffChance = 90
+            buffNum = enemyNum
+        elif togo == "보스전":
+            commonBuffChance = 25
+            rareBuffChance = 55
+            buffNum = 3
+
+    while buffNum > inst:
+        python:
+            buffChoice = []
+            for i in range(3):
+                dice = random.randint(0, 100)
+                if dice < commonBuffChance:
+                    buff = random.choice(commonBuffList)
+                elif dice < rareBuffChance:
+                    buff = random.choice(rareBuffList)
+                else:
+                    buff = random.choice(legendaryBuffList)
+                buffChoice.append(buff)
+        menu:
+            "원하는 버프를 선택하세요."
+            "[buffChoice[0].name]: [buffChoice[0].description]":
+                $ buffChoice[0].apply()
+                a "[buffChoice[0].name](을)를 획득했습니다!"
+            "[buffChoice[1].name]: [buffChoice[1].description]":
+                $ buffChoice[1].apply()
+                a "[buffChoice[1].name](을)를 획득했습니다!"
+            "[buffChoice[2].name]: [buffChoice[2].description]":
+                $ buffChoice[2].apply()
+                a "[buffChoice[2].name](을)를 획득했습니다!"
+        $ inst += 1
+    return
 
 # GUI
 screen set_name(title, init_name):
