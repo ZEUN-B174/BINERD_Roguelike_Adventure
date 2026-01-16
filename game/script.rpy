@@ -368,10 +368,10 @@ image meru merong = "Meru_merong.png"
 
 # 이미지 변형
 transform hit:
-    linear 0.05 xoffset -50
-    linear 0.05 xoffset 50
-    linear 0.05 xoffset -25
-    linear 0.05 xoffset 25
+    linear 0.05 xoffset -70
+    linear 0.05 xoffset 70
+    linear 0.05 xoffset -35
+    linear 0.05 xoffset 35
     linear 0.05 xoffset 0
 
 transform dodge:
@@ -701,7 +701,7 @@ label battle:
     call battleSystem(commonEnemyList)
     call getReward()
 
-    jump roadSign_bgmChange
+    jump roadSign
 # 이곳은 전투 구역의 끝입니다.
 
 label EliteBattle:
@@ -713,7 +713,7 @@ label EliteBattle:
     call battleSystem(eliteEnemyList)
     call getReward()
 
-    jump roadSign_bgmChange
+    jump roadSign
 # 이곳은 정예 구역의 끝입니다.
 
 label BossBattle:
@@ -723,14 +723,14 @@ label BossBattle:
 
     $ enemyNum = 1
     call battleSystem(bossList)
-    call getReward()
+    if not (mode == "story" and floor == 3):
+        call getReward()
     
-    play music "Unexplored Area.mp3"
     python:
         areanum = 0
         floor += 1
         dice = random.randint(1, 10)
-    if (floor == 3 and (dice == 4 or mode == "tutorial")):
+    if floor == 3 and (dice == 4 or mode == "tutorial"):
         jump pioneer
     elif floor == 4:
         if mode == "tutorial":
@@ -1126,11 +1126,13 @@ label battleSystem(enemyList):
         enemy = enemyQueue[0]
         enemy.hp = enemy.maxHp
 
-    $ dice = random.randint(1, 2)
+    $ dice = random.randint(1, 3)
     if dice == 1:
         play music "WKTKFGKRHTLVEK.wav" fadein 1.0
-    else:
+    elif dice == 2:
         play music "DUNGEON_WKTKF.wav" fadein 1.0
+    else:
+        play music "Selfmate.wav" fadein 1.0
 
     hide screen simple_stat
     hide screen stat_details
@@ -1166,7 +1168,7 @@ label battleSystem(enemyList):
             "회복: 최대체력의 {color=#7c4dff}[int(player.healCoef*100)]%%{/color} 만큼 체력을 회복합니다.":
                 $ healPlayer()
                 show tester heal
-                pause(0.2)
+                pause(0.3)
                 show tester standby
                 "체력을 {color=#7c4dff}[int(player.maxHp*player.healCoef)]{/color}만큼 회복했습니다!"
         
@@ -1204,6 +1206,7 @@ label battleSystem(enemyList):
         stop music fadeout 1.0
         jump report
     else:
+        play music "Unexplored Area.mp3"
         a "전투가 종료되었습니다."
     return
     
